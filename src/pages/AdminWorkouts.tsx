@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import WorkoutAIAssistant from "@/components/WorkoutAIAssistant";
 
 interface Workout {
   id: string;
@@ -63,6 +64,7 @@ const AdminWorkouts = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
+  const [aiOpen, setAiOpen] = useState(false);
 
   const weekStartStr = formatDateISO(weekStart);
 
@@ -115,7 +117,13 @@ const AdminWorkouts = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-black text-foreground mb-6">Treinos da Semana</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-black text-foreground">Treinos da Semana</h1>
+        <Button onClick={() => setAiOpen(true)} variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
+          <Sparkles className="h-4 w-4 mr-2" />
+          Assistente IA
+        </Button>
+      </div>
 
       {/* Week selector */}
       <div className="flex items-center justify-center gap-4 mb-8">
@@ -210,6 +218,12 @@ const AdminWorkouts = () => {
           })}
         </div>
       )}
+
+      <WorkoutAIAssistant
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        weekStart={weekStartStr}
+      />
     </div>
   );
 };

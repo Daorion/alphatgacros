@@ -1,1 +1,10 @@
 project_id = "acfoovxhqhbskrnzhfuq"
+
+[functions.admin-users]
+verify_jwt = false
+
+[functions.import-workouts]
+verify_jwt = false
+
+[functions.workout-ai-assistant]
+verify_jwt = false

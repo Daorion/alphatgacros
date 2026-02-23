@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import WorkoutAIAssistant, { type WorkoutSuggestion } from "@/components/WorkoutAIAssistant";
 
 const DAY_NAMES = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 const AVAILABLE_TAGS = ["força", "engine", "ginástica", "potência", "recuperação", "skill"];
@@ -50,6 +51,18 @@ const AdminWorkoutForm = () => {
   const [weekLabel, setWeekLabel] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(isEdit);
+  const [aiOpen, setAiOpen] = useState(false);
+
+  const handleAIApply = (suggestion: WorkoutSuggestion) => {
+    setTitle(suggestion.title);
+    setIntensity(suggestion.intensity);
+    setTags(suggestion.tags);
+    setWarmup(suggestion.warmup || "");
+    setActivation(suggestion.activation || "");
+    setStrength(suggestion.strength || "");
+    setWod(suggestion.wod || "");
+    setNotes(suggestion.notes || "");
+  };
 
   useEffect(() => {
     if (!isEdit) return;
@@ -137,12 +150,18 @@ const AdminWorkoutForm = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-card border-b border-border px-4 py-4">
-        <div className="container mx-auto flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos")}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+            <span className="font-bold text-foreground">{isEdit ? "Editar Treino" : "Novo Treino"}</span>
+          </div>
+          <Button onClick={() => setAiOpen(true)} variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10">
+            <Sparkles className="h-4 w-4 mr-2" />
+            Assistente IA
           </Button>
-          <span className="font-bold text-foreground">{isEdit ? "Editar Treino" : "Novo Treino"}</span>
         </div>
       </header>
 
@@ -287,6 +306,14 @@ const AdminWorkoutForm = () => {
           </form>
         </Card>
       </main>
+
+      <WorkoutAIAssistant
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        weekStart={weekStart}
+        dayOfWeek={dayOfWeek}
+        onApply={handleAIApply}
+      />
     </div>
   );
 };
