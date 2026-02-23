@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Workout {
@@ -59,7 +58,6 @@ const WorkoutSection = ({ icon, label, content }: { icon: string; label: string;
 );
 
 const AdminWorkouts = () => {
-  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -106,11 +104,6 @@ const AdminWorkouts = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
 
@@ -121,130 +114,102 @@ const AdminWorkouts = () => {
   workouts.forEach((w) => workoutByDay.set(w.day_of_week, w));
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-background/60 backdrop-blur-xl border-b border-border/30 px-4 py-4 sticky top-0 z-40">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
-            <div>
-              <span className="font-black text-foreground tracking-wider text-sm uppercase">Planilha de Treino</span>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Gerenciar treinos semanais</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos/importar")} className="hover:bg-primary/10 hover:text-primary text-xs">
-              📥 Importar
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/insights")} className="hover:bg-primary/10 hover:text-primary text-xs">
-              📊 Insights
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="hover:bg-primary/10 hover:text-primary text-xs">
-              ← Painel
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-primary/10 hover:text-primary">
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+    <div>
+      <h1 className="text-2xl font-black text-foreground mb-6">Treinos da Semana</h1>
+
+      {/* Week selector */}
+      <div className="flex items-center justify-center gap-4 mb-8">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => changeWeek(-1)}
+          className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        <div className="text-center glass rounded-xl px-6 py-3">
+          <h2 className="text-base font-black text-foreground">{weekLabel}</h2>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+            {weekStart.toLocaleDateString("pt-BR")} → {weekEnd.toLocaleDateString("pt-BR")}
+          </p>
         </div>
-      </header>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => changeWeek(1)}
+          className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+      </div>
 
-      <main className="container mx-auto px-4 py-6">
-        {/* Week selector */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => changeWeek(-1)}
-            className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <div className="text-center glass rounded-xl px-6 py-3">
-            <h2 className="text-base font-black text-foreground">{weekLabel}</h2>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {weekStart.toLocaleDateString("pt-BR")} → {weekEnd.toLocaleDateString("pt-BR")}
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => changeWeek(1)}
-            className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
         </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {DAY_NAMES.map((dayName, index) => {
+            const workout = workoutByDay.get(index);
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {DAY_NAMES.map((dayName, index) => {
-              const workout = workoutByDay.get(index);
-
-              return (
-                <div key={index} className="glass rounded-xl p-4 flex flex-col border-gradient transition-all duration-300 hover:-translate-y-0.5">
-                  {/* Day header */}
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-black text-foreground tracking-wide">{dayName}</h3>
-                    {workout?.intensity && (
-                      <span className={`text-[10px] font-bold uppercase ${INTENSITY_COLORS[workout.intensity] || "text-muted-foreground"}`}>
-                        {workout.intensity}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Tags */}
-                  {workout?.tags && workout.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {workout.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${TAG_COLORS[tag] || "bg-muted text-muted-foreground border-border"}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {workout ? (
-                    <div className="flex-1">
-                      {workout.warmup && <WorkoutSection icon="🔥" label="WARM-UP" content={workout.warmup} />}
-                      {workout.activation && <WorkoutSection icon="⚡" label="ATIVAÇÃO" content={workout.activation} />}
-                      {workout.strength && <WorkoutSection icon="🏋️" label="FORÇA/TÉCNICA" content={workout.strength} />}
-                      {workout.wod && <WorkoutSection icon="💀" label="WOD" content={workout.wod} />}
-                      {workout.notes && <WorkoutSection icon="📝" label="OBS" content={workout.notes} />}
-
-                      <div className="flex items-center gap-1 mt-4 pt-3 border-t border-border/20">
-                        <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/treinos/${workout.id}`)} className="hover:bg-primary/10 hover:text-primary text-xs">
-                          <Pencil className="h-3 w-3 mr-1" /> Editar
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(workout.id)} className="hover:bg-destructive/10 hover:text-destructive text-xs">
-                          <Trash2 className="h-3 w-3 mr-1" /> Excluir
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex-1 flex items-center justify-center py-8">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5"
-                        onClick={() => navigate(`/admin/treinos/novo?week=${weekStartStr}&day=${index}`)}
-                      >
-                        <Plus className="h-4 w-4 mr-1" /> Adicionar Treino
-                      </Button>
-                    </div>
+            return (
+              <div key={index} className="glass rounded-xl p-4 flex flex-col border-gradient transition-all duration-300 hover:-translate-y-0.5">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-black text-foreground tracking-wide">{dayName}</h3>
+                  {workout?.intensity && (
+                    <span className={`text-[10px] font-bold uppercase ${INTENSITY_COLORS[workout.intensity] || "text-muted-foreground"}`}>
+                      {workout.intensity}
+                    </span>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
+
+                {workout?.tags && workout.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {workout.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${TAG_COLORS[tag] || "bg-muted text-muted-foreground border-border"}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {workout ? (
+                  <div className="flex-1">
+                    {workout.warmup && <WorkoutSection icon="🔥" label="WARM-UP" content={workout.warmup} />}
+                    {workout.activation && <WorkoutSection icon="⚡" label="ATIVAÇÃO" content={workout.activation} />}
+                    {workout.strength && <WorkoutSection icon="🏋️" label="FORÇA/TÉCNICA" content={workout.strength} />}
+                    {workout.wod && <WorkoutSection icon="💀" label="WOD" content={workout.wod} />}
+                    {workout.notes && <WorkoutSection icon="📝" label="OBS" content={workout.notes} />}
+
+                    <div className="flex items-center gap-1 mt-4 pt-3 border-t border-border/20">
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/treinos/${workout.id}`)} className="hover:bg-primary/10 hover:text-primary text-xs">
+                        <Pencil className="h-3 w-3 mr-1" /> Editar
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(workout.id)} className="hover:bg-destructive/10 hover:text-destructive text-xs">
+                        <Trash2 className="h-3 w-3 mr-1" /> Excluir
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                      onClick={() => navigate(`/admin/treinos/novo?week=${weekStartStr}&day=${index}`)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Adicionar Treino
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -10,12 +10,16 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import ClientDashboard from "./pages/ClientDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLayout from "./components/AdminLayout";
+import AdminOverview from "./pages/AdminOverview";
+import AdminUsers from "./pages/AdminUsers";
 import AdminUserForm from "./pages/AdminUserForm";
 import AdminWorkouts from "./pages/AdminWorkouts";
 import AdminWorkoutForm from "./pages/AdminWorkoutForm";
 import AdminImportWorkouts from "./pages/AdminImportWorkouts";
 import AdminInsights from "./pages/AdminInsights";
+import AdminAuditLogs from "./pages/AdminAuditLogs";
+import AdminProfile from "./pages/AdminProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,70 +58,27 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              {/* Admin routes with shared layout */}
               <Route
                 path="/admin"
                 element={
                   <ProtectedRoute requiredRole="admin">
-                    <AdminDashboard />
+                    <AdminLayout />
                   </ProtectedRoute>
                 }
-              />
-              <Route
-                path="/admin/usuarios/novo"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminUserForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/usuarios/:id"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminUserForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/treinos"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminWorkouts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/treinos/novo"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminWorkoutForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/treinos/:id"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminWorkoutForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/treinos/importar"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminImportWorkouts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/insights"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminInsights />
-                  </ProtectedRoute>
-                }
-              />
+              >
+                <Route index element={<AdminOverview />} />
+                <Route path="usuarios" element={<AdminUsers />} />
+                <Route path="usuarios/novo" element={<AdminUserForm />} />
+                <Route path="usuarios/:id" element={<AdminUserForm />} />
+                <Route path="treinos" element={<AdminWorkouts />} />
+                <Route path="treinos/novo" element={<AdminWorkoutForm />} />
+                <Route path="treinos/:id" element={<AdminWorkoutForm />} />
+                <Route path="treinos/importar" element={<AdminImportWorkouts />} />
+                <Route path="insights" element={<AdminInsights />} />
+                <Route path="auditoria" element={<AdminAuditLogs />} />
+                <Route path="perfil" element={<AdminProfile />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

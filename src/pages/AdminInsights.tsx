@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, LogOut, BarChart3, Target, Flame, Calendar } from "lucide-react";
+import { BarChart3, Target, Flame, Calendar } from "lucide-react";
 
 interface Workout {
   id: string;
@@ -38,7 +35,6 @@ const INTENSITY_COLORS: Record<string, string> = {
 
 const DAY_NAMES = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
-// Extract exercises from text
 function extractExercises(text: string | null): string[] {
   if (!text) return [];
   const exercises: string[] = [];
@@ -46,7 +42,6 @@ function extractExercises(text: string | null): string[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    // Extract exercise names (remove numbers, reps, sets, percentages)
     const match = trimmed.match(/(?:\d+\s*(?:x|X)\s*\d+\s+)?(.+)/);
     if (match) {
       const name = match[1]
@@ -67,8 +62,6 @@ function extractExercises(text: string | null): string[] {
 }
 
 const AdminInsights = () => {
-  const { signOut } = useAuth();
-  const navigate = useNavigate();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -84,32 +77,22 @@ const AdminInsights = () => {
     fetchAll();
   }, []);
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
       </div>
     );
   }
 
   // --- Analytics ---
-
-  // 1. Tag distribution
   const tagCounts: Record<string, number> = {};
   workouts.forEach((w) => {
-    w.tags?.forEach((tag) => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-    });
+    w.tags?.forEach((tag) => { tagCounts[tag] = (tagCounts[tag] || 0) + 1; });
   });
   const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
   const maxTagCount = sortedTags[0]?.[1] || 1;
 
-  // 2. Intensity distribution
   const intensityCounts: Record<string, number> = { leve: 0, média: 0, alta: 0 };
   workouts.forEach((w) => {
     if (w.intensity && intensityCounts[w.intensity] !== undefined) {
@@ -118,20 +101,15 @@ const AdminInsights = () => {
   });
   const totalIntensity = Object.values(intensityCounts).reduce((a, b) => a + b, 0) || 1;
 
-  // 3. Day coverage
   const dayCounts = Array(7).fill(0);
-  workouts.forEach((w) => {
-    dayCounts[w.day_of_week]++;
-  });
+  workouts.forEach((w) => { dayCounts[w.day_of_week]++; });
   const maxDayCount = Math.max(...dayCounts) || 1;
 
-  // 4. Exercise frequency (from all sections)
   const exerciseFreq: Record<string, number> = {};
   workouts.forEach((w) => {
     const allText = [w.warmup, w.activation, w.strength, w.wod].join("\n");
     const exercises = extractExercises(allText);
     exercises.forEach((ex) => {
-      // Normalize common exercises
       const normalized = ex
         .replace(/\s+/g, " ")
         .replace(/back squat/i, "Back Squat")
@@ -163,194 +141,151 @@ const AdminInsights = () => {
       }
     });
   });
-  const sortedExercises = Object.entries(exerciseFreq)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 20);
+  const sortedExercises = Object.entries(exerciseFreq).sort((a, b) => b[1] - a[1]).slice(0, 20);
   const maxExerciseCount = sortedExercises[0]?.[1] || 1;
 
-  // 5. Weeks count
   const uniqueWeeks = new Set(workouts.map((w) => w.week_start));
 
-  // 6. Missing areas detection
   const allTags = ["força", "engine", "ginástica", "potência", "recuperação", "skill"];
   const missingTags = allTags.filter((tag) => !tagCounts[tag] || tagCounts[tag] < 3);
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border px-4 py-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
-            <div>
-              <span className="font-black text-foreground tracking-wider text-lg">INSIGHTS</span>
-              <p className="text-xs text-muted-foreground">Análise dos treinos</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos")}>
-              ← Treinos
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div>
+      <h1 className="text-2xl font-black text-foreground mb-6">Insights</h1>
 
-      <main className="container mx-auto px-4 py-6">
-        {/* Summary cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4 bg-card border-border text-center">
-            <Calendar className="h-6 w-6 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-black text-foreground">{uniqueWeeks.size}</p>
-            <p className="text-xs text-muted-foreground">Semanas</p>
-          </Card>
-          <Card className="p-4 bg-card border-border text-center">
-            <BarChart3 className="h-6 w-6 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-black text-foreground">{workouts.length}</p>
-            <p className="text-xs text-muted-foreground">Treinos</p>
-          </Card>
-          <Card className="p-4 bg-card border-border text-center">
-            <Target className="h-6 w-6 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-black text-foreground">{sortedExercises.length}</p>
-            <p className="text-xs text-muted-foreground">Exercícios únicos</p>
-          </Card>
-          <Card className="p-4 bg-card border-border text-center">
-            <Flame className="h-6 w-6 text-red-500 mx-auto mb-2" />
-            <p className="text-2xl font-black text-foreground">{intensityCounts.alta}</p>
-            <p className="text-xs text-muted-foreground">Dias de alta intensidade</p>
-          </Card>
-        </div>
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Card className="p-4 bg-card border-border text-center">
+          <Calendar className="h-6 w-6 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{uniqueWeeks.size}</p>
+          <p className="text-xs text-muted-foreground">Semanas</p>
+        </Card>
+        <Card className="p-4 bg-card border-border text-center">
+          <BarChart3 className="h-6 w-6 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{workouts.length}</p>
+          <p className="text-xs text-muted-foreground">Treinos</p>
+        </Card>
+        <Card className="p-4 bg-card border-border text-center">
+          <Target className="h-6 w-6 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{sortedExercises.length}</p>
+          <p className="text-xs text-muted-foreground">Exercícios únicos</p>
+        </Card>
+        <Card className="p-4 bg-card border-border text-center">
+          <Flame className="h-6 w-6 text-red-500 mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{intensityCounts.alta}</p>
+          <p className="text-xs text-muted-foreground">Dias de alta intensidade</p>
+        </Card>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Tag distribution */}
-          <Card className="p-6 bg-card border-border">
-            <h3 className="text-base font-black text-foreground mb-4">📊 Distribuição por Categoria</h3>
-            {sortedTags.length > 0 ? (
-              <div className="space-y-3">
-                {sortedTags.map(([tag, count]) => (
-                  <div key={tag}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-muted text-muted-foreground"}`}>
-                        {tag}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{count}x</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="bg-primary h-2 rounded-full transition-all"
-                        style={{ width: `${(count / maxTagCount) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Sem dados de categorias.</p>
-            )}
-          </Card>
-
-          {/* Intensity distribution */}
-          <Card className="p-6 bg-card border-border">
-            <h3 className="text-base font-black text-foreground mb-4">🔥 Distribuição de Intensidade</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Tag distribution */}
+        <Card className="p-6 bg-card border-border">
+          <h3 className="text-base font-black text-foreground mb-4">📊 Distribuição por Categoria</h3>
+          {sortedTags.length > 0 ? (
             <div className="space-y-3">
-              {(["leve", "média", "alta"] as const).map((intensity) => {
-                const count = intensityCounts[intensity];
-                const pct = Math.round((count / totalIntensity) * 100);
-                return (
-                  <div key={intensity}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-bold text-foreground capitalize">{intensity}</span>
-                      <span className="text-xs text-muted-foreground">{count}x ({pct}%)</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-3">
-                      <div
-                        className={`${INTENSITY_COLORS[intensity]} h-3 rounded-full transition-all`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+              {sortedTags.map(([tag, count]) => (
+                <div key={tag}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-muted text-muted-foreground"}`}>{tag}</span>
+                    <span className="text-xs text-muted-foreground">{count}x</span>
                   </div>
-                );
-              })}
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(count / maxTagCount) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
-          </Card>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">Sem dados de categorias.</p>
+          )}
+        </Card>
 
-          {/* Day coverage */}
-          <Card className="p-6 bg-card border-border">
-            <h3 className="text-base font-black text-foreground mb-4">📅 Cobertura por Dia da Semana</h3>
-            <div className="grid grid-cols-7 gap-2">
-              {DAY_NAMES.map((day, i) => {
-                const count = dayCounts[i];
-                const height = Math.max(20, (count / maxDayCount) * 100);
-                return (
-                  <div key={day} className="flex flex-col items-center">
-                    <div className="w-full bg-muted rounded-t" style={{ height: '80px' }}>
-                      <div className="w-full flex flex-col justify-end" style={{ height: '80px' }}>
-                        <div
-                          className="w-full bg-primary rounded-t transition-all"
-                          style={{ height: `${height}%` }}
-                        />
-                      </div>
-                    </div>
-                    <p className="text-[10px] font-bold text-muted-foreground mt-1">{day}</p>
-                    <p className="text-[10px] text-foreground font-bold">{count}</p>
+        {/* Intensity distribution */}
+        <Card className="p-6 bg-card border-border">
+          <h3 className="text-base font-black text-foreground mb-4">🔥 Distribuição de Intensidade</h3>
+          <div className="space-y-3">
+            {(["leve", "média", "alta"] as const).map((intensity) => {
+              const count = intensityCounts[intensity];
+              const pct = Math.round((count / totalIntensity) * 100);
+              return (
+                <div key={intensity}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-bold text-foreground capitalize">{intensity}</span>
+                    <span className="text-xs text-muted-foreground">{count}x ({pct}%)</span>
                   </div>
-                );
-              })}
+                  <div className="w-full bg-muted rounded-full h-3">
+                    <div className={`${INTENSITY_COLORS[intensity]} h-3 rounded-full transition-all`} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Day coverage */}
+        <Card className="p-6 bg-card border-border">
+          <h3 className="text-base font-black text-foreground mb-4">📅 Cobertura por Dia da Semana</h3>
+          <div className="grid grid-cols-7 gap-2">
+            {DAY_NAMES.map((day, i) => {
+              const count = dayCounts[i];
+              const height = Math.max(20, (count / maxDayCount) * 100);
+              return (
+                <div key={day} className="flex flex-col items-center">
+                  <div className="w-full bg-muted rounded-t" style={{ height: '80px' }}>
+                    <div className="w-full flex flex-col justify-end" style={{ height: '80px' }}>
+                      <div className="w-full bg-primary rounded-t transition-all" style={{ height: `${height}%` }} />
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-1">{day}</p>
+                  <p className="text-[10px] text-foreground font-bold">{count}</p>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Missing areas */}
+        <Card className="p-6 bg-card border-border">
+          <h3 className="text-base font-black text-foreground mb-4">⚠️ Áreas com Baixa Frequência</h3>
+          {missingTags.length > 0 ? (
+            <div className="space-y-3">
+              {missingTags.map((tag) => (
+                <div key={tag} className="flex items-center justify-between p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                  <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-muted text-muted-foreground"}`}>{tag}</span>
+                  <span className="text-xs text-destructive font-bold">{tagCounts[tag] || 0} aparições — precisa de mais atenção</span>
+                </div>
+              ))}
             </div>
-          </Card>
+          ) : (
+            <p className="text-sm text-green-400">✅ Todas as categorias estão com boa cobertura!</p>
+          )}
+        </Card>
 
-          {/* Missing areas */}
-          <Card className="p-6 bg-card border-border">
-            <h3 className="text-base font-black text-foreground mb-4">⚠️ Áreas com Baixa Frequência</h3>
-            {missingTags.length > 0 ? (
-              <div className="space-y-3">
-                {missingTags.map((tag) => (
-                  <div key={tag} className="flex items-center justify-between p-3 bg-destructive/10 rounded-lg border border-destructive/20">
-                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-muted text-muted-foreground"}`}>
-                      {tag}
-                    </span>
-                    <span className="text-xs text-destructive font-bold">
-                      {tagCounts[tag] || 0} aparições — precisa de mais atenção
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-green-400">✅ Todas as categorias estão com boa cobertura!</p>
-            )}
-          </Card>
-
-          {/* Top exercises */}
-          <Card className="p-6 bg-card border-border lg:col-span-2">
-            <h3 className="text-base font-black text-foreground mb-4">🏆 Top 20 Exercícios Mais Utilizados</h3>
-            {sortedExercises.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                {sortedExercises.map(([name, count], i) => (
-                  <div key={name} className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-5 text-right font-bold">{i + 1}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-xs text-foreground font-medium truncate">{name}</span>
-                        <span className="text-[10px] text-muted-foreground ml-2">{count}x</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-1.5">
-                        <div
-                          className="bg-primary h-1.5 rounded-full"
-                          style={{ width: `${(count / maxExerciseCount) * 100}%` }}
-                        />
-                      </div>
+        {/* Top exercises */}
+        <Card className="p-6 bg-card border-border lg:col-span-2">
+          <h3 className="text-base font-black text-foreground mb-4">🏆 Top 20 Exercícios Mais Utilizados</h3>
+          {sortedExercises.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+              {sortedExercises.map(([name, count], i) => (
+                <div key={name} className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-5 text-right font-bold">{i + 1}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs text-foreground font-medium truncate">{name}</span>
+                      <span className="text-[10px] text-muted-foreground ml-2">{count}x</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: `${(count / maxExerciseCount) * 100}%` }} />
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Sem dados de exercícios.</p>
-            )}
-          </Card>
-        </div>
-      </main>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">Sem dados de exercícios.</p>
+          )}
+        </Card>
+      </div>
     </div>
   );
 };
