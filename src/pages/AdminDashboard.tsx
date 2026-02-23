@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { LogOut, Users, Plus, Search, Shield, UserCheck, UserX, RotateCcw, Pencil } from "lucide-react";
+import { LogOut, Users, Plus, Search, Shield, UserCheck, UserX, RotateCcw, Pencil, Dumbbell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserListItem {
@@ -139,6 +139,14 @@ const AdminDashboard = () => {
             <p className="text-2xl font-black text-foreground">{stats.admins}</p>
             <p className="text-xs text-muted-foreground">Admins</p>
           </Card>
+        </div>
+
+        {/* Quick nav */}
+        <div className="mb-6">
+          <Button variant="outline" onClick={() => navigate("/admin/treinos")} className="gap-2">
+            <Dumbbell className="h-4 w-4" />
+            Treinos da Semana
+          </Button>
         </div>
 
         {/* Actions */}

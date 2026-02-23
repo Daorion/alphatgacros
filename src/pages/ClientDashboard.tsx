@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LogOut, User, CalendarDays, CreditCard, MessageSquare, AlertTriangle } from "lucide-react";
+import { LogOut, User, CalendarDays, CreditCard, MessageSquare, AlertTriangle, Dumbbell } from "lucide-react";
 
 interface ProfileData {
   full_name: string | null;
@@ -15,24 +15,49 @@ interface ProfileData {
   status: string;
 }
 
+interface WorkoutItem {
+  day_of_week: number;
+  title: string;
+  description: string | null;
+}
+
+const DAY_NAMES = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+function getMonday(date: Date): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return d.toISOString().split("T")[0];
+}
+
 const ClientDashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [workouts, setWorkouts] = useState<WorkoutItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, plan_name, plan_status, next_renewal, notes, status")
-        .eq("id", user.id)
-        .single();
-      setProfile(data as ProfileData);
+      const [profileRes, workoutsRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("full_name, plan_name, plan_status, next_renewal, notes, status")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("weekly_workouts")
+          .select("day_of_week, title, description")
+          .eq("week_start", getMonday(new Date()))
+          .order("day_of_week"),
+      ]);
+      setProfile(profileRes.data as ProfileData);
+      setWorkouts(workoutsRes.data || []);
       setLoading(false);
     };
-    fetchProfile();
+    fetchData();
   }, [user]);
 
   const handleLogout = async () => {
@@ -131,6 +156,31 @@ const ClientDashboard = () => {
             </p>
           </Card>
         </div>
+
+        {/* Treinos da Semana */}
+        <Card className="mt-6 p-6 bg-card border-border">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Dumbbell className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground">Treinos da Semana</h2>
+          </div>
+          {workouts.length > 0 ? (
+            <div className="space-y-3">
+              {workouts.map((w, i) => (
+                <div key={i} className="border-l-2 border-primary pl-3">
+                  <p className="text-xs text-muted-foreground font-bold uppercase">{DAY_NAMES[w.day_of_week]}</p>
+                  <p className="text-sm text-primary font-semibold">{w.title}</p>
+                  {w.description && (
+                    <p className="text-xs text-muted-foreground whitespace-pre-line mt-0.5">{w.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">Nenhum treino cadastrado para esta semana.</p>
+          )}
+        </Card>
 
         {profile?.plan_status !== "active" && (
           <Card className="mt-6 p-4 bg-destructive/10 border-destructive/30">
