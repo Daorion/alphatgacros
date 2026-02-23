@@ -36,7 +36,7 @@ All colors MUST be HSL.
     --input: 0 0% 20%;
     --ring: 16 100% 50%;
 
-    --radius: 0.25rem;
+    --radius: 0.75rem;
 
     /* Spartan Brand Colors */
     --spartan-orange: 16 100% 50%;
@@ -70,5 +70,91 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism */
+  .glass {
+    @apply bg-card/40 backdrop-blur-xl border border-border/50;
+  }
+
+  .glass-strong {
+    @apply bg-card/60 backdrop-blur-2xl border border-border/40;
+  }
+
+  /* Text gradient */
+  .text-gradient-fire {
+    @apply text-transparent bg-clip-text;
+    background-image: var(--gradient-fire);
+  }
+
+  /* Gradient border effect */
+  .border-gradient {
+    position: relative;
+  }
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-fire);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .border-gradient:hover::before {
+    opacity: 1;
+  }
+
+  /* Shimmer border animation */
+  .shimmer-border {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-border::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(from var(--shimmer-angle, 0deg), transparent 60%, hsl(16 100% 50%) 80%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: shimmer-rotate 3s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmer-rotate {
+    to {
+      --shimmer-angle: 360deg;
+    }
+  }
+
+  @property --shimmer-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  /* Floating decoration */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .float-delay {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  /* Section divider gradient */
+  .divider-gradient {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(16 100% 50% / 0.5), transparent);
   }
 }

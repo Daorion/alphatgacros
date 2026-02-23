@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -32,7 +31,6 @@ const Login = () => {
     if (error) {
       toast({ title: "Erro no login", description: error, variant: "destructive" });
     }
-    // Redirect is handled by LoginRedirect in App.tsx based on role
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -54,33 +52,45 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <img src="/images/hero-gym.webp" alt="" className="w-full h-full object-cover" aria-hidden />
+        <div className="absolute inset-0 bg-spartan-black/90 backdrop-blur-sm" />
+      </div>
+
+      {/* Decorative */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-10 w-px h-40 bg-gradient-to-b from-transparent via-primary/15 to-transparent float" />
+        <div className="absolute bottom-1/3 right-16 w-px h-60 bg-gradient-to-b from-transparent via-primary/10 to-transparent float-delay" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md px-4 animate-scale-in">
         <div className="text-center mb-8">
           <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-16 mx-auto mb-4" />
           <h1 className="text-3xl font-black text-foreground">ALPHA CROSS</h1>
-          <p className="text-muted-foreground mt-2">Área restrita</p>
+          <p className="text-muted-foreground mt-2 text-sm">Área restrita</p>
         </div>
 
-        <Card className="p-8 bg-card border-border">
+        <div className="glass-strong rounded-xl p-8">
           {!showReset ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <Label htmlFor="email" className="text-foreground text-xs uppercase tracking-wider font-bold">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-background border-border"
+                  className="bg-background/50 border-border/50 focus:border-primary transition-colors"
                   required
                   autoComplete="email"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">Senha</Label>
+                <Label htmlFor="password" className="text-foreground text-xs uppercase tracking-wider font-bold">Senha</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -88,7 +98,7 @@ const Login = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-background border-border pr-10"
+                    className="bg-background/50 border-border/50 pr-10 focus:border-primary transition-colors"
                     required
                     autoComplete="current-password"
                   />
@@ -102,7 +112,7 @@ const Login = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-fire" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-gradient-fire hover:shadow-glow-spartan transition-all duration-300" disabled={isLoading}>
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-foreground" />
                 ) : (
@@ -139,10 +149,10 @@ const Login = () => {
                     placeholder="seu@email.com"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    className="bg-background border-border"
+                    className="bg-background/50 border-border/50 focus:border-primary transition-colors"
                     required
                   />
-                  <Button type="submit" className="w-full bg-gradient-fire" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-gradient-fire hover:shadow-glow-spartan transition-all duration-300" disabled={isLoading}>
                     {isLoading ? "Enviando..." : "Enviar Link"}
                   </Button>
                 </form>
@@ -157,7 +167,7 @@ const Login = () => {
               </button>
             </div>
           )}
-        </Card>
+        </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
           O cadastro é feito exclusivamente pelo administrador.
