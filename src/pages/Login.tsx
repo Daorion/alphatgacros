@@ -31,10 +31,8 @@ const Login = () => {
 
     if (error) {
       toast({ title: "Erro no login", description: error, variant: "destructive" });
-    } else {
-      // Redirect based on role will happen in useEffect
-      navigate("/cliente");
     }
+    // Redirect is handled by LoginRedirect in App.tsx based on role
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {

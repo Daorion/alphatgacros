@@ -18,7 +18,13 @@ const queryClient = new QueryClient();
 
 const LoginRedirect = () => {
   const { user, userRole, loading } = useAuth();
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+      </div>
+    );
+  }
   if (!user) return <Login />;
   if (userRole === "admin") return <Navigate to="/admin" replace />;
   return <Navigate to="/cliente" replace />;
