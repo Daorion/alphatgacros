@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import alphaEscudo from "@/assets/alpha-cross-escudo.png";
 
 export const Hero = () => {
   return (
@@ -25,9 +26,14 @@ export const Hero = () => {
             CrossFit de Elite
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 text-primary tracking-wider drop-shadow-[0_0_40px_hsla(16,100%,50%,0.3)]">
-            ALPHA CROSS
-          </h1>
+          <div className="relative inline-block mb-2">
+            <div className="absolute inset-0 blur-2xl opacity-50 bg-primary/30 rounded-full scale-110 animate-glow-pulse" />
+            <img
+              src={alphaEscudo}
+              alt="Alpha Cross - Escudo Espartano"
+              className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto drop-shadow-[0_0_40px_hsla(16,100%,50%,0.5)] animate-scale-in hover:scale-110 transition-transform duration-500"
+            />
+          </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 text-foreground tracking-tight">
             ONDE O SEU LIMITE
