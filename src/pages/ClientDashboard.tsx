@@ -53,7 +53,7 @@ function getMonday(date: Date): string {
 }
 
 const ClientDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [workouts, setWorkouts] = useState<WorkoutItem[]>([]);
@@ -132,6 +132,7 @@ const ClientDashboard = () => {
               <p><span className="text-muted-foreground">Nome:</span> <span className="text-foreground">{profile?.full_name || "—"}</span></p>
               <p><span className="text-muted-foreground">Email:</span> <span className="text-foreground">{user?.email}</span></p>
               <p><span className="text-muted-foreground">Status:</span> <span className={`font-bold ${profile?.status === "active" ? "text-green-500" : "text-red-500"}`}>{profile?.status === "active" ? "Ativo" : "Inativo"}</span></p>
+              <p><span className="text-muted-foreground">Perfil:</span> <span className="text-foreground font-semibold">{userRole === "admin" ? "Administrador" : "Cliente"}</span></p>
             </div>
           </Card>
 
