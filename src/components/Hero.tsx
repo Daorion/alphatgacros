@@ -18,25 +18,26 @@ export const Hero = () => {
         <div className="absolute top-1/4 right-1/4 w-20 h-20 border border-primary/10 rounded-full float" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-20 text-center">
-        <div className="animate-fade-in">
+      <div className="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
+        <div className="animate-fade-in flex flex-col items-center">
           {/* Logo */}
-          <div className="relative inline-block mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 blur-3xl opacity-50 bg-primary/30 rounded-full scale-125 animate-glow-pulse" />
             <img
               src={alphaEscudo}
               alt="Alpha Cross - Escudo Espartano"
-              className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[28rem] lg:h-[28rem] mx-auto drop-shadow-[0_0_60px_hsla(16,100%,50%,0.5)] animate-scale-in hover:scale-105 transition-transform duration-500"
+              className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[28rem] lg:h-[28rem] drop-shadow-[0_0_60px_hsla(16,100%,50%,0.5)] animate-scale-in hover:scale-105 transition-transform duration-500"
             />
           </div>
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-bold uppercase tracking-[0.2em] text-primary mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-glow-pulse" />
             CrossFit de Elite
           </div>
 
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 text-foreground tracking-tight">
+          {/* Título */}
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 text-foreground tracking-tight text-center">
             ONDE O SEU LIMITE
             <br />
             <span className="text-gradient-fire">
@@ -44,7 +45,7 @@ export const Hero = () => {
             </span>
           </h2>
 
-          <p className="text-lg md:text-xl mb-12 text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg md:text-xl mb-12 text-muted-foreground max-w-2xl font-medium leading-relaxed text-center">
             Legado espartano de superação. Transforme sua vontade em poder através do treinamento de alta intensidade.
           </p>
 
