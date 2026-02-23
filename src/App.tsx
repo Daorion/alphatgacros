@@ -14,6 +14,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUserForm from "./pages/AdminUserForm";
 import AdminWorkouts from "./pages/AdminWorkouts";
 import AdminWorkoutForm from "./pages/AdminWorkoutForm";
+import AdminImportWorkouts from "./pages/AdminImportWorkouts";
+import AdminInsights from "./pages/AdminInsights";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -97,6 +99,22 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRole="admin">
                     <AdminWorkoutForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/treinos/importar"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminImportWorkouts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/insights"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminInsights />
                   </ProtectedRoute>
                 }
               />

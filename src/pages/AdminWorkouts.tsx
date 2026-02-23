@@ -133,6 +133,12 @@ const AdminWorkouts = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos/importar")}>
+              📥 Importar
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/insights")}>
+              📊 Insights
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
               ← Painel
             </Button>
