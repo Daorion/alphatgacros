@@ -208,6 +208,42 @@ Deno.serve(async (req) => {
       });
     }
 
+    // AUDIT LOGS
+    if (req.method === "GET" && action === "audit-logs") {
+      const { data: logs, error } = await adminClient
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      // Get profile names for actors and targets
+      const userIds = new Set<string>();
+      logs?.forEach((l: any) => {
+        if (l.actor_id) userIds.add(l.actor_id);
+        if (l.target_user_id) userIds.add(l.target_user_id);
+      });
+
+      const { data: profiles } = await adminClient
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", Array.from(userIds));
+
+      const namesMap: Record<string, string> = {};
+      profiles?.forEach((p: any) => { namesMap[p.id] = p.full_name || ""; });
+
+      const result = logs?.map((l: any) => ({
+        ...l,
+        actor_name: namesMap[l.actor_id] || "",
+        target_name: l.target_user_id ? namesMap[l.target_user_id] || "" : null,
+      }));
+
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Ação não encontrada" }), {
       status: 404,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
