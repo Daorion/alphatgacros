@@ -1,100 +1,115 @@
 
 
-## Planilha de Treinos Semanal
+# Modernizacao da UI - Alpha Cross
 
-### Resumo
-Criar uma funcionalidade de **Planilha de Treinos Semanal** onde o admin gerencia os treinos da semana (compartilhados para todos os alunos), e os clientes visualizam no seu dashboard.
+## Visao Geral
 
----
-
-### 1. Nova tabela no banco: `weekly_workouts`
-
-| Coluna | Tipo | Descrição |
-|---|---|---|
-| id | uuid (PK) | Identificador |
-| week_start | date (unique) | Segunda-feira da semana |
-| day_of_week | integer (0-6) | Dia da semana (0=Segunda ... 6=Domingo) |
-| title | text | Nome do treino (ex: "WOD Alpha") |
-| description | text | Detalhes do treino (exercicios, reps, tempo) |
-| created_by | uuid | ID do admin que criou |
-| created_at / updated_at | timestamptz | Controle temporal |
-
-**RLS:**
-- Admins: CRUD completo
-- Clientes autenticados: somente leitura (SELECT)
+Vou aplicar uma reformulacao visual em todo o site para dar um aspecto mais moderno, premium e imersivo -- mantendo a identidade espartana/CrossFit da marca. As mudancas abrangem a landing page publica, as telas de login, dashboard do cliente e painel admin.
 
 ---
 
-### 2. Arquivos a criar/modificar
+## Mudancas Propostas
 
-**Novos:**
-- `src/pages/AdminWorkouts.tsx` -- Pagina admin para gerenciar treinos da semana (selecionar semana, adicionar/editar/remover treinos por dia)
-- `src/pages/AdminWorkoutForm.tsx` -- Formulario para criar/editar um treino de um dia especifico
+### 1. Sistema de Design (CSS/Tailwind)
 
-**Modificados:**
-- `src/App.tsx` -- Adicionar rotas `/admin/treinos` e `/admin/treinos/novo`
-- `src/pages/AdminDashboard.tsx` -- Adicionar botao/link de navegacao para "Treinos da Semana"
-- `src/pages/ClientDashboard.tsx` -- Adicionar card mostrando os treinos da semana atual
+- Aumentar o `--radius` de `0.25rem` para `0.75rem` para cards e botoes mais arredondados e modernos
+- Adicionar efeito de **glassmorphism** (backdrop-blur + semi-transparencia) nos cards e header
+- Criar novas animacoes: `slide-up`, `blur-in`, e `float` para elementos decorativos
+- Adicionar gradiente de texto mais sofisticado e sombras suaves nos titulos
+- Melhorar spacing e tipografia geral
+
+### 2. Header (Navegacao)
+
+- Aplicar glassmorphism completo no header (`bg-background/60 backdrop-blur-xl`)
+- Adicionar indicador ativo nos links de navegacao (underline animado)
+- Botao "Area Restrita" com borda gradient ao inves de outline simples
+- Menu mobile com animacao slide-in suave
+
+### 3. Hero Section
+
+- Adicionar particulas/elementos decorativos flutuantes (linhas diagonais ou formas geometricas sutis em CSS)
+- Tipografia mais dramatica com `text-shadow` para profundidade
+- Botoes com efeito hover mais sofisticado (scale + glow)
+- Badge/chip acima do titulo principal (ex: "CROSSFIT DE ELITE")
+- Scroll indicator mais elegante
+
+### 4. Secao Legado (Valores)
+
+- Cards com efeito glassmorphism e borda gradient sutil no hover
+- Icones dentro de circulos com animacao de pulso sutil
+- Numero/indice decorativo em cada card (01, 02, 03, 04)
+- Linha decorativa separando o titulo da descricao
+
+### 5. Secao Programas
+
+- Card destacado (Legiao Alpha) com animacao de brilho (shimmer border)
+- Adicionar preco ou indicador visual de nivel
+- Hover com elevacao mais pronunciada (translate-y + shadow)
+- Badge "Mais Popular" com animacao sutil
+
+### 6. Galeria
+
+- Hover com overlay mostrando o nome/legenda da foto
+- Layout com variacao de tamanhos (algumas fotos maiores que outras usando grid spans)
+- Animacao de entrada escalonada (staggered) ao scrollar
+
+### 7. Contato
+
+- Formulario com campos que possuem animacao de foco (label que sobe)
+- Cards de contato com icones maiores e hover mais expressivo
+- Mapa embed ou imagem de fundo sutil
+
+### 8. Footer
+
+- Layout mais rico com colunas (links rapidos, contato, redes sociais)
+- Logo maior e tagline
+- Separador gradient ao inves de borda simples
+
+### 9. Tela de Login
+
+- Adicionar imagem de fundo com overlay (reutilizar hero-gym.webp)
+- Card de login com glassmorphism
+- Animacao de entrada (fade-in + scale-in)
+
+### 10. Dashboard do Cliente
+
+- Header com glassmorphism
+- Cards com hover elevado e gradientes sutis nos icones
+- Cards de treino com visual mais compacto e tags coloridas maiores
+- Secao de avisos com design diferenciado (borda lateral colorida)
+
+### 11. Painel Admin
+
+- Header unificado com navegacao lateral ou tabs
+- Stats cards com micro-animacoes (contagem crescente)
+- Tabela de usuarios com linhas alternadas e hover mais suave
+- Botoes de acao com tooltips
 
 ---
 
-### 3. Fluxo Admin
+## Detalhes Tecnicos
 
-1. No painel admin, clicar em "Treinos da Semana"
-2. Ver a semana atual com os 7 dias (Seg-Dom)
-3. Navegar entre semanas (anterior/proxima)
-4. Para cada dia: adicionar, editar ou remover o treino
-5. Cada treino tem titulo e descricao (texto livre para detalhar exercicios)
+### Arquivos que serao modificados:
 
-### 4. Fluxo Cliente
+| Arquivo | Tipo de mudanca |
+|---|---|
+| `src/index.css` | Novas variaveis CSS, classes utilitarias, glassmorphism, animacoes |
+| `tailwind.config.ts` | Novas animacoes, keyframes, cores extras |
+| `src/components/Header.tsx` | Glassmorphism, links animados, menu mobile melhorado |
+| `src/components/Hero.tsx` | Badge, tipografia, elementos decorativos, botoes melhorados |
+| `src/components/Legacy.tsx` | Cards glass, numeros decorativos, animacoes |
+| `src/components/Programs.tsx` | Shimmer border, hover elevado, badges |
+| `src/components/Gallery.tsx` | Grid variado, overlay com legendas, entrada animada |
+| `src/components/Contact.tsx` | Campos animados, cards de contato melhorados |
+| `src/components/Footer.tsx` | Layout multi-coluna, separador gradient |
+| `src/pages/Login.tsx` | Background image, glassmorphism, animacao de entrada |
+| `src/pages/ClientDashboard.tsx` | Cards modernizados, header glass, treinos visuais |
+| `src/pages/AdminDashboard.tsx` | Stats animados, tabela melhorada |
+| `src/pages/AdminWorkouts.tsx` | Cards de treino refinados |
 
-1. No dashboard do cliente, ver um card "Treinos da Semana"
-2. Exibe os treinos da semana atual organizados por dia
-3. Somente leitura
-
----
-
-### Detalhes Tecnicos
-
-**Migracao SQL:**
-```text
-CREATE TABLE public.weekly_workouts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  week_start date NOT NULL,
-  day_of_week integer NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
-  title text NOT NULL,
-  description text,
-  created_by uuid REFERENCES auth.users(id),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE(week_start, day_of_week)
-);
-
-ALTER TABLE public.weekly_workouts ENABLE ROW LEVEL SECURITY;
-
--- Admins: full access
-CREATE POLICY "Admins can do everything on workouts"
-  ON public.weekly_workouts FOR ALL TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role))
-  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
-
--- Clients: read only
-CREATE POLICY "Authenticated users can view workouts"
-  ON public.weekly_workouts FOR SELECT TO authenticated
-  USING (true);
-
--- Trigger for updated_at
-CREATE TRIGGER update_weekly_workouts_updated_at
-  BEFORE UPDATE ON public.weekly_workouts
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
-
-**Rotas novas no App.tsx:**
-- `/admin/treinos` -> `AdminWorkouts` (protegida, admin)
-- `/admin/treinos/novo` -> `AdminWorkoutForm` (protegida, admin)
-- `/admin/treinos/:id` -> `AdminWorkoutForm` para edicao
-
-**AdminWorkouts.tsx:** Tela com seletor de semana, grid 7 dias, cada dia mostra o treino ou botao "Adicionar". Botoes de editar/excluir em cada treino.
-
-**ClientDashboard.tsx:** Novo card "Treinos da Semana" que busca `weekly_workouts` da semana atual e mostra os treinos organizados por dia.
+### Abordagem:
+- Todas as mudancas sao puramente visuais (CSS/Tailwind + JSX)
+- Nenhuma mudanca em logica de negocio ou banco de dados
+- Compatibilidade total com mobile mantida
+- Performance preservada (animacoes via CSS, sem bibliotecas extras)
 
