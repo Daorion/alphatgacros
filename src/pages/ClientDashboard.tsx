@@ -99,13 +99,13 @@ const ClientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border px-4 py-4">
+      <header className="bg-background/60 backdrop-blur-xl border-b border-border/30 px-4 py-4 sticky top-0 z-40">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
-            <span className="font-bold text-foreground">Área do Aluno</span>
+            <span className="font-bold text-foreground text-sm uppercase tracking-wider">Área do Aluno</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-primary/10 hover:text-primary">
             <LogOut className="h-4 w-4 mr-2" />
             Sair
           </Button>
@@ -115,82 +115,49 @@ const ClientDashboard = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-black text-foreground">
-            Olá, <span className="text-primary">{profile?.full_name || "Aluno"}</span>
+            Olá, <span className="text-gradient-fire">{profile?.full_name || "Aluno"}</span>
           </h1>
-          <p className="text-muted-foreground mt-1">Bem-vindo à sua área exclusiva.</p>
+          <p className="text-muted-foreground mt-1 text-sm">Bem-vindo à sua área exclusiva.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">Meus Dados</h2>
-            </div>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-muted-foreground">Nome:</span> <span className="text-foreground">{profile?.full_name || "—"}</span></p>
-              <p><span className="text-muted-foreground">Email:</span> <span className="text-foreground">{user?.email}</span></p>
-              <p><span className="text-muted-foreground">Status:</span> <span className={`font-bold ${profile?.status === "active" ? "text-green-500" : "text-red-500"}`}>{profile?.status === "active" ? "Ativo" : "Inativo"}</span></p>
-              <p><span className="text-muted-foreground">Perfil:</span> <span className="text-foreground font-semibold">{userRole === "admin" ? "Administrador" : "Cliente"}</span></p>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoCard icon={User} title="Meus Dados">
+            <InfoRow label="Nome" value={profile?.full_name || "—"} />
+            <InfoRow label="Email" value={user?.email || ""} />
+            <InfoRow label="Status" value={profile?.status === "active" ? "Ativo" : "Inativo"} valueClass={profile?.status === "active" ? "text-green-500 font-bold" : "text-red-500 font-bold"} />
+            <InfoRow label="Perfil" value={userRole === "admin" ? "Administrador" : "Cliente"} valueClass="font-semibold" />
+          </InfoCard>
 
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <CreditCard className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">Meu Plano</h2>
-            </div>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-muted-foreground">Plano:</span> <span className="text-foreground font-semibold">{profile?.plan_name || "Não definido"}</span></p>
-              <p><span className="text-muted-foreground">Situação:</span> <span className={`font-bold ${statusColor}`}>{statusLabel}</span></p>
-            </div>
-          </Card>
+          <InfoCard icon={CreditCard} title="Meu Plano">
+            <InfoRow label="Plano" value={profile?.plan_name || "Não definido"} valueClass="font-semibold" />
+            <InfoRow label="Situação" value={statusLabel} valueClass={`font-bold ${statusColor}`} />
+          </InfoCard>
 
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <CalendarDays className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">Renovação</h2>
-            </div>
-            <p className="text-sm">
-              <span className="text-muted-foreground">Próxima renovação:</span>{" "}
-              <span className="text-foreground font-semibold">
-                {profile?.next_renewal
-                  ? new Date(profile.next_renewal).toLocaleDateString("pt-BR")
-                  : "Não definida"}
-              </span>
-            </p>
-          </Card>
+          <InfoCard icon={CalendarDays} title="Renovação">
+            <InfoRow
+              label="Próxima renovação"
+              value={profile?.next_renewal ? new Date(profile.next_renewal).toLocaleDateString("pt-BR") : "Não definida"}
+              valueClass="font-semibold"
+            />
+          </InfoCard>
 
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <MessageSquare className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">Avisos</h2>
-            </div>
-            <p className="text-sm text-foreground">
-              {profile?.notes || "Nenhum aviso no momento."}
-            </p>
-          </Card>
+          <InfoCard icon={MessageSquare} title="Avisos">
+            <p className="text-sm text-foreground">{profile?.notes || "Nenhum aviso no momento."}</p>
+          </InfoCard>
         </div>
 
         {/* Treinos da Semana */}
-        <Card className="mt-6 p-6 bg-card border-border">
+        <div className="mt-6 glass rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Dumbbell className="h-5 w-5 text-primary" />
             </div>
             <h2 className="text-lg font-bold text-foreground">Treinos da Semana</h2>
           </div>
           {workouts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {workouts.map((w, i) => (
-                <Card key={i} className="p-4 bg-background border-border">
+                <div key={i} className="glass rounded-lg p-4 border-gradient">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-black text-foreground">{DAY_NAMES[w.day_of_week]}</h3>
                     {w.intensity && (
@@ -208,57 +175,58 @@ const ClientDashboard = () => {
                       ))}
                     </div>
                   )}
-                  {w.warmup && (
-                    <div className="mt-2">
-                      <p className="text-[10px] font-bold text-primary">🔥 WARM-UP</p>
-                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.warmup}</pre>
-                    </div>
-                  )}
-                  {w.activation && (
-                    <div className="mt-2">
-                      <p className="text-[10px] font-bold text-primary">⚡ ATIVAÇÃO</p>
-                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.activation}</pre>
-                    </div>
-                  )}
-                  {w.strength && (
-                    <div className="mt-2">
-                      <p className="text-[10px] font-bold text-primary">🏋️ FORÇA/TÉCNICA</p>
-                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.strength}</pre>
-                    </div>
-                  )}
-                  {w.wod && (
-                    <div className="mt-2">
-                      <p className="text-[10px] font-bold text-primary">💀 WOD</p>
-                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.wod}</pre>
-                    </div>
-                  )}
-                  {w.notes && (
-                    <div className="mt-2">
-                      <p className="text-[10px] font-bold text-primary">📝 OBS</p>
-                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.notes}</pre>
-                    </div>
-                  )}
-                </Card>
+                  {w.warmup && <WorkoutBlock icon="🔥" label="WARM-UP" content={w.warmup} />}
+                  {w.activation && <WorkoutBlock icon="⚡" label="ATIVAÇÃO" content={w.activation} />}
+                  {w.strength && <WorkoutBlock icon="🏋️" label="FORÇA/TÉCNICA" content={w.strength} />}
+                  {w.wod && <WorkoutBlock icon="💀" label="WOD" content={w.wod} />}
+                  {w.notes && <WorkoutBlock icon="📝" label="OBS" content={w.notes} />}
+                </div>
               ))}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">Nenhum treino cadastrado para esta semana.</p>
           )}
-        </Card>
+        </div>
 
         {profile?.plan_status !== "active" && (
-          <Card className="mt-6 p-4 bg-destructive/10 border-destructive/30">
+          <div className="mt-6 glass rounded-xl p-4 border-l-4 border-l-destructive">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5 text-destructive" />
               <p className="text-sm text-destructive font-medium">
                 Seu plano está inadimplente. Entre em contato com a administração.
               </p>
             </div>
-          </Card>
+          </div>
         )}
       </main>
     </div>
   );
 };
+
+const InfoCard = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
+  <div className="glass rounded-xl p-6 border-gradient transition-all duration-300 hover:-translate-y-0.5">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+        <Icon className="h-5 w-5 text-primary" />
+      </div>
+      <h2 className="text-base font-bold text-foreground">{title}</h2>
+    </div>
+    <div className="space-y-2 text-sm">{children}</div>
+  </div>
+);
+
+const InfoRow = ({ label, value, valueClass = "text-foreground" }: { label: string; value: string; valueClass?: string }) => (
+  <p>
+    <span className="text-muted-foreground">{label}:</span>{" "}
+    <span className={valueClass}>{value}</span>
+  </p>
+);
+
+const WorkoutBlock = ({ icon, label, content }: { icon: string; label: string; content: string }) => (
+  <div className="mt-2">
+    <p className="text-[10px] font-bold text-primary">{icon} {label}</p>
+    <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{content}</pre>
+  </div>
+);
 
 export default ClientDashboard;

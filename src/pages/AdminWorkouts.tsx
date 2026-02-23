@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { LogOut, ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -123,28 +122,27 @@ const AdminWorkouts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border px-4 py-4">
+      <header className="bg-background/60 backdrop-blur-xl border-b border-border/30 px-4 py-4 sticky top-0 z-40">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
             <div>
-              <span className="font-black text-foreground tracking-wider text-lg">PLANILHA DE TREINO</span>
-              <p className="text-xs text-muted-foreground">Gerenciar treinos semanais</p>
+              <span className="font-black text-foreground tracking-wider text-sm uppercase">Planilha de Treino</span>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Gerenciar treinos semanais</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos/importar")}>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/treinos/importar")} className="hover:bg-primary/10 hover:text-primary text-xs">
               📥 Importar
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/insights")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/insights")} className="hover:bg-primary/10 hover:text-primary text-xs">
               📊 Insights
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="hover:bg-primary/10 hover:text-primary text-xs">
               ← Painel
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-primary/10 hover:text-primary">
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -152,17 +150,27 @@ const AdminWorkouts = () => {
 
       <main className="container mx-auto px-4 py-6">
         {/* Week selector */}
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <Button variant="outline" size="icon" onClick={() => changeWeek(-1)} className="border-border">
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => changeWeek(-1)}
+            className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
+          >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <div className="text-center">
-            <h2 className="text-lg font-black text-foreground">{weekLabel}</h2>
-            <p className="text-xs text-muted-foreground">
+          <div className="text-center glass rounded-xl px-6 py-3">
+            <h2 className="text-base font-black text-foreground">{weekLabel}</h2>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
               {weekStart.toLocaleDateString("pt-BR")} → {weekEnd.toLocaleDateString("pt-BR")}
             </p>
           </div>
-          <Button variant="outline" size="icon" onClick={() => changeWeek(1)} className="border-border">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => changeWeek(1)}
+            className="border-border/50 hover:border-primary/50 hover:bg-primary/5"
+          >
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
@@ -177,12 +185,12 @@ const AdminWorkouts = () => {
               const workout = workoutByDay.get(index);
 
               return (
-                <Card key={index} className="p-4 bg-card border-border flex flex-col">
+                <div key={index} className="glass rounded-xl p-4 flex flex-col border-gradient transition-all duration-300 hover:-translate-y-0.5">
                   {/* Day header */}
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-base font-black text-foreground tracking-wide">{dayName}</h3>
+                    <h3 className="text-sm font-black text-foreground tracking-wide">{dayName}</h3>
                     {workout?.intensity && (
-                      <span className={`text-xs font-bold uppercase ${INTENSITY_COLORS[workout.intensity] || "text-muted-foreground"}`}>
+                      <span className={`text-[10px] font-bold uppercase ${INTENSITY_COLORS[workout.intensity] || "text-muted-foreground"}`}>
                         {workout.intensity}
                       </span>
                     )}
@@ -194,7 +202,7 @@ const AdminWorkouts = () => {
                       {workout.tags.map((tag) => (
                         <span
                           key={tag}
-                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${TAG_COLORS[tag] || "bg-muted text-muted-foreground border-border"}`}
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${TAG_COLORS[tag] || "bg-muted text-muted-foreground border-border"}`}
                         >
                           {tag}
                         </span>
@@ -210,12 +218,12 @@ const AdminWorkouts = () => {
                       {workout.wod && <WorkoutSection icon="💀" label="WOD" content={workout.wod} />}
                       {workout.notes && <WorkoutSection icon="📝" label="OBS" content={workout.notes} />}
 
-                      <div className="flex items-center gap-1 mt-4 pt-3 border-t border-border">
-                        <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/treinos/${workout.id}`)}>
-                          <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+                      <div className="flex items-center gap-1 mt-4 pt-3 border-t border-border/20">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/treinos/${workout.id}`)} className="hover:bg-primary/10 hover:text-primary text-xs">
+                          <Pencil className="h-3 w-3 mr-1" /> Editar
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(workout.id)}>
-                          <Trash2 className="h-3.5 w-3.5 mr-1 text-destructive" /> Excluir
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(workout.id)} className="hover:bg-destructive/10 hover:text-destructive text-xs">
+                          <Trash2 className="h-3 w-3 mr-1" /> Excluir
                         </Button>
                       </div>
                     </div>
@@ -224,14 +232,14 @@ const AdminWorkouts = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-dashed border-border"
+                        className="border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5"
                         onClick={() => navigate(`/admin/treinos/novo?week=${weekStartStr}&day=${index}`)}
                       >
                         <Plus className="h-4 w-4 mr-1" /> Adicionar Treino
                       </Button>
                     </div>
                   )}
-                </Card>
+                </div>
               );
             })}
           </div>

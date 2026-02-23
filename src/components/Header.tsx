@@ -23,11 +23,18 @@ export const Header = () => {
     }
   };
 
+  const navLinks = [
+    { label: "Início", id: "hero" },
+    { label: "Legado", id: "legacy" },
+    { label: "Programas", id: "programs" },
+    { label: "Contato", id: "contact" },
+  ];
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-intense"
+          ? "bg-background/60 backdrop-blur-xl shadow-intense border-b border-border/30"
           : "bg-transparent"
       }`}
     >
@@ -38,15 +45,23 @@ export const Header = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <button onClick={() => scrollToSection("hero")} className="text-foreground hover:text-primary transition-colors font-bold">Início</button>
-            <button onClick={() => scrollToSection("legacy")} className="text-foreground hover:text-primary transition-colors font-bold">Legado</button>
-            <button onClick={() => scrollToSection("programs")} className="text-foreground hover:text-primary transition-colors font-bold">Programas</button>
-            <button onClick={() => scrollToSection("contact")} className="text-foreground hover:text-primary transition-colors font-bold">Contato</button>
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className="relative text-foreground hover:text-primary transition-colors font-bold text-sm uppercase tracking-wider after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-[-4px] after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"
+              >
+                {link.label}
+              </button>
+            ))}
           </div>
 
           <div className="flex items-center gap-4">
             <Link to="/login">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button
+                size="sm"
+                className="gap-2 bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+              >
                 <LogIn className="h-4 w-4" />
                 <span className="hidden md:inline">Área Restrita</span>
               </Button>
@@ -54,23 +69,32 @@ export const Header = () => {
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-foreground p-2 hover:bg-accent rounded-md transition-colors"
+              className="md:hidden text-foreground p-2 hover:bg-accent/50 rounded-lg transition-colors"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t border-border">
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ${
+            isMobileMenuOpen ? "max-h-60 opacity-100 mt-4" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="py-4 border-t border-border/30 glass rounded-lg px-4">
             <div className="flex flex-col gap-4">
-              <button onClick={() => scrollToSection("hero")} className="text-foreground hover:text-primary transition-colors font-bold text-left">Início</button>
-              <button onClick={() => scrollToSection("legacy")} className="text-foreground hover:text-primary transition-colors font-bold text-left">Legado</button>
-              <button onClick={() => scrollToSection("programs")} className="text-foreground hover:text-primary transition-colors font-bold text-left">Programas</button>
-              <button onClick={() => scrollToSection("contact")} className="text-foreground hover:text-primary transition-colors font-bold text-left">Contato</button>
+              {navLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  className="text-foreground hover:text-primary transition-colors font-bold text-left text-sm uppercase tracking-wider"
+                >
+                  {link.label}
+                </button>
+              ))}
             </div>
           </div>
-        )}
+        </div>
       </nav>
     </header>
   );
