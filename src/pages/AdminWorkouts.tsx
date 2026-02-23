@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LogOut, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Dumbbell } from "lucide-react";
+import { LogOut, ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Workout {
@@ -12,10 +12,32 @@ interface Workout {
   week_start: string;
   day_of_week: number;
   title: string;
-  description: string | null;
+  intensity: string | null;
+  tags: string[] | null;
+  warmup: string | null;
+  activation: string | null;
+  strength: string | null;
+  wod: string | null;
+  notes: string | null;
+  week_label: string | null;
 }
 
-const DAY_NAMES = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+const DAY_NAMES = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+
+const INTENSITY_COLORS: Record<string, string> = {
+  leve: "text-green-400",
+  média: "text-yellow-400",
+  alta: "text-red-400",
+};
+
+const TAG_COLORS: Record<string, string> = {
+  força: "bg-red-500/20 text-red-400 border-red-500/30",
+  engine: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  ginástica: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  potência: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  recuperação: "bg-green-500/20 text-green-400 border-green-500/30",
+  skill: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+};
 
 function getMonday(date: Date): Date {
   const d = new Date(date);
@@ -29,6 +51,13 @@ function getMonday(date: Date): Date {
 function formatDateISO(date: Date): string {
   return date.toISOString().split("T")[0];
 }
+
+const WorkoutSection = ({ icon, label, content }: { icon: string; label: string; content: string }) => (
+  <div className="mt-3">
+    <p className="text-xs font-bold text-primary mb-1">{icon} {label}</p>
+    <pre className="text-xs text-foreground/80 whitespace-pre-wrap font-sans leading-relaxed">{content}</pre>
+  </div>
+);
 
 const AdminWorkouts = () => {
   const { signOut } = useAuth();
@@ -51,7 +80,7 @@ const AdminWorkouts = () => {
     if (error) {
       toast({ title: "Erro", description: "Não foi possível carregar os treinos.", variant: "destructive" });
     } else {
-      setWorkouts(data || []);
+      setWorkouts((data as Workout[]) || []);
     }
     setLoading(false);
   };
@@ -73,7 +102,7 @@ const AdminWorkouts = () => {
     if (error) {
       toast({ title: "Erro", description: "Não foi possível excluir.", variant: "destructive" });
     } else {
-      toast({ title: "Excluído" });
+      toast({ title: "Treino excluído" });
       fetchWorkouts();
     }
   };
@@ -85,7 +114,9 @@ const AdminWorkouts = () => {
 
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
-  const weekLabel = `${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} — ${weekEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}`;
+
+  const weekLabel = workouts[0]?.week_label || 
+    `${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} → ${weekEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}`;
 
   const workoutByDay = new Map<number, Workout>();
   workouts.forEach((w) => workoutByDay.set(w.day_of_week, w));
@@ -96,7 +127,10 @@ const AdminWorkouts = () => {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
-            <span className="font-bold text-foreground">Treinos da Semana</span>
+            <div>
+              <span className="font-black text-foreground tracking-wider text-lg">PLANILHA DE TREINO</span>
+              <p className="text-xs text-muted-foreground">Gerenciar treinos semanais</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
@@ -110,14 +144,19 @@ const AdminWorkouts = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-6">
         {/* Week selector */}
-        <div className="flex items-center justify-between mb-8">
-          <Button variant="outline" size="icon" onClick={() => changeWeek(-1)}>
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <Button variant="outline" size="icon" onClick={() => changeWeek(-1)} className="border-border">
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-black text-foreground text-center">{weekLabel}</h1>
-          <Button variant="outline" size="icon" onClick={() => changeWeek(1)}>
+          <div className="text-center">
+            <h2 className="text-lg font-black text-foreground">{weekLabel}</h2>
+            <p className="text-xs text-muted-foreground">
+              {weekStart.toLocaleDateString("pt-BR")} → {weekEnd.toLocaleDateString("pt-BR")}
+            </p>
+          </div>
+          <Button variant="outline" size="icon" onClick={() => changeWeek(1)} className="border-border">
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
@@ -127,67 +166,65 @@ const AdminWorkouts = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {DAY_NAMES.map((dayName, index) => {
               const workout = workoutByDay.get(index);
-              const dayDate = new Date(weekStart);
-              dayDate.setDate(dayDate.getDate() + index);
 
               return (
-                <Card key={index} className="p-4 bg-card border-border">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                        <Dumbbell className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-foreground">
-                          {dayName}{" "}
-                          <span className="text-muted-foreground font-normal">
-                            ({dayDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })})
-                          </span>
-                        </p>
-                        {workout ? (
-                          <>
-                            <p className="text-sm text-primary font-semibold mt-1">{workout.title}</p>
-                            {workout.description && (
-                              <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">{workout.description}</p>
-                            )}
-                          </>
-                        ) : (
-                          <p className="text-xs text-muted-foreground mt-1 italic">Sem treino</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
-                      {workout ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate(`/admin/treinos/${workout.id}`)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(workout.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => navigate(`/admin/treinos/novo?week=${weekStartStr}&day=${index}`)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                <Card key={index} className="p-4 bg-card border-border flex flex-col">
+                  {/* Day header */}
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-base font-black text-foreground tracking-wide">{dayName}</h3>
+                    {workout?.intensity && (
+                      <span className={`text-xs font-bold uppercase ${INTENSITY_COLORS[workout.intensity] || "text-muted-foreground"}`}>
+                        {workout.intensity}
+                      </span>
+                    )}
                   </div>
+
+                  {/* Tags */}
+                  {workout?.tags && workout.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {workout.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${TAG_COLORS[tag] || "bg-muted text-muted-foreground border-border"}`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {workout ? (
+                    <div className="flex-1">
+                      {workout.warmup && <WorkoutSection icon="🔥" label="WARM-UP" content={workout.warmup} />}
+                      {workout.activation && <WorkoutSection icon="⚡" label="ATIVAÇÃO" content={workout.activation} />}
+                      {workout.strength && <WorkoutSection icon="🏋️" label="FORÇA/TÉCNICA" content={workout.strength} />}
+                      {workout.wod && <WorkoutSection icon="💀" label="WOD" content={workout.wod} />}
+                      {workout.notes && <WorkoutSection icon="📝" label="OBS" content={workout.notes} />}
+
+                      <div className="flex items-center gap-1 mt-4 pt-3 border-t border-border">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/treinos/${workout.id}`)}>
+                          <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(workout.id)}>
+                          <Trash2 className="h-3.5 w-3.5 mr-1 text-destructive" /> Excluir
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center py-8">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-dashed border-border"
+                        onClick={() => navigate(`/admin/treinos/novo?week=${weekStartStr}&day=${index}`)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" /> Adicionar Treino
+                      </Button>
+                    </div>
+                  )}
                 </Card>
               );
             })}

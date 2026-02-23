@@ -18,10 +18,31 @@ interface ProfileData {
 interface WorkoutItem {
   day_of_week: number;
   title: string;
-  description: string | null;
+  intensity: string | null;
+  tags: string[] | null;
+  warmup: string | null;
+  activation: string | null;
+  strength: string | null;
+  wod: string | null;
+  notes: string | null;
 }
 
-const DAY_NAMES = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const DAY_NAMES = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+
+const TAG_COLORS: Record<string, string> = {
+  força: "bg-red-500/20 text-red-400",
+  engine: "bg-orange-500/20 text-orange-400",
+  ginástica: "bg-purple-500/20 text-purple-400",
+  potência: "bg-yellow-500/20 text-yellow-400",
+  recuperação: "bg-green-500/20 text-green-400",
+  skill: "bg-blue-500/20 text-blue-400",
+};
+
+const INTENSITY_COLORS: Record<string, string> = {
+  leve: "text-green-400",
+  média: "text-yellow-400",
+  alta: "text-red-400",
+};
 
 function getMonday(date: Date): string {
   const d = new Date(date);
@@ -49,12 +70,12 @@ const ClientDashboard = () => {
           .single(),
         supabase
           .from("weekly_workouts")
-          .select("day_of_week, title, description")
+          .select("day_of_week, title, intensity, tags, warmup, activation, strength, wod, notes")
           .eq("week_start", getMonday(new Date()))
           .order("day_of_week"),
       ]);
       setProfile(profileRes.data as ProfileData);
-      setWorkouts(workoutsRes.data || []);
+      setWorkouts((workoutsRes.data as WorkoutItem[]) || []);
       setLoading(false);
     };
     fetchData();
@@ -166,15 +187,57 @@ const ClientDashboard = () => {
             <h2 className="text-lg font-bold text-foreground">Treinos da Semana</h2>
           </div>
           {workouts.length > 0 ? (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {workouts.map((w, i) => (
-                <div key={i} className="border-l-2 border-primary pl-3">
-                  <p className="text-xs text-muted-foreground font-bold uppercase">{DAY_NAMES[w.day_of_week]}</p>
-                  <p className="text-sm text-primary font-semibold">{w.title}</p>
-                  {w.description && (
-                    <p className="text-xs text-muted-foreground whitespace-pre-line mt-0.5">{w.description}</p>
+                <Card key={i} className="p-4 bg-background border-border">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-black text-foreground">{DAY_NAMES[w.day_of_week]}</h3>
+                    {w.intensity && (
+                      <span className={`text-[10px] font-bold uppercase ${INTENSITY_COLORS[w.intensity] || "text-muted-foreground"}`}>
+                        {w.intensity}
+                      </span>
+                    )}
+                  </div>
+                  {w.tags && w.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {w.tags.map((tag) => (
+                        <span key={tag} className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${TAG_COLORS[tag] || "bg-muted text-muted-foreground"}`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   )}
-                </div>
+                  {w.warmup && (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-bold text-primary">🔥 WARM-UP</p>
+                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.warmup}</pre>
+                    </div>
+                  )}
+                  {w.activation && (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-bold text-primary">⚡ ATIVAÇÃO</p>
+                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.activation}</pre>
+                    </div>
+                  )}
+                  {w.strength && (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-bold text-primary">🏋️ FORÇA/TÉCNICA</p>
+                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.strength}</pre>
+                    </div>
+                  )}
+                  {w.wod && (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-bold text-primary">💀 WOD</p>
+                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.wod}</pre>
+                    </div>
+                  )}
+                  {w.notes && (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-bold text-primary">📝 OBS</p>
+                      <pre className="text-[11px] text-foreground/80 whitespace-pre-wrap font-sans">{w.notes}</pre>
+                    </div>
+                  )}
+                </Card>
               ))}
             </div>
           ) : (
