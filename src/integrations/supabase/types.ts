@@ -142,34 +142,58 @@ export type Database = {
       }
       weekly_workouts: {
         Row: {
+          activation: string | null
           created_at: string
           created_by: string | null
           day_of_week: number
           description: string | null
           id: string
+          intensity: string | null
+          notes: string | null
+          strength: string | null
+          tags: string[] | null
           title: string
           updated_at: string
+          warmup: string | null
+          week_label: string | null
           week_start: string
+          wod: string | null
         }
         Insert: {
+          activation?: string | null
           created_at?: string
           created_by?: string | null
           day_of_week: number
           description?: string | null
           id?: string
+          intensity?: string | null
+          notes?: string | null
+          strength?: string | null
+          tags?: string[] | null
           title: string
           updated_at?: string
+          warmup?: string | null
+          week_label?: string | null
           week_start: string
+          wod?: string | null
         }
         Update: {
+          activation?: string | null
           created_at?: string
           created_by?: string | null
           day_of_week?: number
           description?: string | null
           id?: string
+          intensity?: string | null
+          notes?: string | null
+          strength?: string | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
+          warmup?: string | null
+          week_label?: string | null
           week_start?: string
+          wod?: string | null
         }
         Relationships: []
       }
