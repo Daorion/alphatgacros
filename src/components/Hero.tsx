@@ -4,8 +4,9 @@ import { ArrowRight } from "lucide-react";
 export const Hero = () => {
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      <div className="absolute inset-0 z-0 bg-spartan-black">
-        <div className="absolute inset-0 bg-gradient-to-b from-spartan-black/95 via-spartan-dark/90 to-spartan-black/95" />
+      <div className="absolute inset-0 z-0">
+        <img src="/images/hero-gym.webp" alt="Alpha Cross Training" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-spartan-black/80 via-spartan-dark/70 to-spartan-black/90" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-20 text-center">

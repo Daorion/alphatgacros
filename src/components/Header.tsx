@@ -51,7 +51,7 @@ export const Header = () => {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <span className="text-2xl font-black text-primary tracking-wider">ALPHA CROSS</span>
+            <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-10 md:h-12" />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
