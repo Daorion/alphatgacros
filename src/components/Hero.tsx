@@ -7,7 +7,7 @@ export const Hero = () => {
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       <div className="absolute inset-0 z-0">
         <img src="/images/hero-gym.webp" alt="Alpha Cross Training" className="w-full h-full object-cover scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-b from-spartan-black/95 via-spartan-dark/90 to-spartan-black/98" />
+        <div className="absolute inset-0 bg-gradient-to-b from-spartan-black/95 via-spartan-dark/90 to-black" />
       </div>
 
       {/* Decorative elements */}
