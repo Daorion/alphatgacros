@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LogOut, User, CalendarDays, CreditCard, MessageSquare, AlertTriangle, Dumbbell } from "lucide-react";
+import { LogOut, User, CalendarDays, CreditCard, MessageSquare, AlertTriangle, Dumbbell, Shield } from "lucide-react";
 
 interface ProfileData {
   full_name: string | null;
@@ -105,10 +105,18 @@ const ClientDashboard = () => {
             <img src="/images/logo-alpha-cross.png" alt="Alpha Cross" className="h-8" />
             <span className="font-bold text-foreground text-sm uppercase tracking-wider">Área do Aluno</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-primary/10 hover:text-primary">
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-2">
+            {userRole === "admin" && (
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin")} className="border-primary/50 text-primary hover:bg-primary/10">
+                <Shield className="h-4 w-4 mr-2" />
+                Painel Admin
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-primary/10 hover:text-primary">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 
