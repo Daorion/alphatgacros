@@ -12,6 +12,8 @@ import ResetPassword from "./pages/ResetPassword";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUserForm from "./pages/AdminUserForm";
+import AdminWorkouts from "./pages/AdminWorkouts";
+import AdminWorkoutForm from "./pages/AdminWorkoutForm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +73,30 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRole="admin">
                     <AdminUserForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/treinos"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminWorkouts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/treinos/novo"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminWorkoutForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/treinos/:id"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminWorkoutForm />
                   </ProtectedRoute>
                 }
               />

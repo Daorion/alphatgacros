@@ -140,6 +140,39 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_workouts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          day_of_week: number
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          day_of_week: number
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          day_of_week?: number
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
