@@ -20,19 +20,20 @@ export const Hero = () => {
 
       <div className="relative z-10 container mx-auto px-4 py-20 text-center">
         <div className="animate-fade-in">
+          {/* Logo */}
+          <div className="relative inline-block mb-6">
+            <div className="absolute inset-0 blur-3xl opacity-50 bg-primary/30 rounded-full scale-125 animate-glow-pulse" />
+            <img
+              src={alphaEscudo}
+              alt="Alpha Cross - Escudo Espartano"
+              className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[28rem] lg:h-[28rem] mx-auto drop-shadow-[0_0_60px_hsla(16,100%,50%,0.5)] animate-scale-in hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-bold uppercase tracking-[0.2em] text-primary mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-glow-pulse" />
             CrossFit de Elite
-          </div>
-
-          <div className="relative inline-block mb-2">
-            <div className="absolute inset-0 blur-2xl opacity-50 bg-primary/30 rounded-full scale-110 animate-glow-pulse" />
-            <img
-              src={alphaEscudo}
-              alt="Alpha Cross - Escudo Espartano"
-              className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto drop-shadow-[0_0_40px_hsla(16,100%,50%,0.5)] animate-scale-in hover:scale-110 transition-transform duration-500"
-            />
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 text-foreground tracking-tight">
