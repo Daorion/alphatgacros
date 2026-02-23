@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       murph_registrations: {
         Row: {
           cpf: string
@@ -56,7 +83,13 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          last_login: string | null
+          next_renewal: string | null
+          notes: string | null
           phone: string | null
+          plan_name: string | null
+          plan_status: string | null
+          status: string
           updated_at: string
         }
         Insert: {
@@ -64,7 +97,13 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          last_login?: string | null
+          next_renewal?: string | null
+          notes?: string | null
           phone?: string | null
+          plan_name?: string | null
+          plan_status?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -72,7 +111,13 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_login?: string | null
+          next_renewal?: string | null
+          notes?: string | null
           phone?: string | null
+          plan_name?: string | null
+          plan_status?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
