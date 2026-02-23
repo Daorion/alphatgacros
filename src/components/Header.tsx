@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Menu, X, LogIn } from "lucide-react";
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,26 +38,27 @@ export const Header = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <button onClick={() => scrollToSection("hero")} className="text-foreground hover:text-primary transition-colors font-bold">
-              Início
-            </button>
-            <button onClick={() => scrollToSection("legacy")} className="text-foreground hover:text-primary transition-colors font-bold">
-              Legado
-            </button>
-            <button onClick={() => scrollToSection("programs")} className="text-foreground hover:text-primary transition-colors font-bold">
-              Programas
-            </button>
-            <button onClick={() => scrollToSection("contact")} className="text-foreground hover:text-primary transition-colors font-bold">
-              Contato
-            </button>
+            <button onClick={() => scrollToSection("hero")} className="text-foreground hover:text-primary transition-colors font-bold">Início</button>
+            <button onClick={() => scrollToSection("legacy")} className="text-foreground hover:text-primary transition-colors font-bold">Legado</button>
+            <button onClick={() => scrollToSection("programs")} className="text-foreground hover:text-primary transition-colors font-bold">Programas</button>
+            <button onClick={() => scrollToSection("contact")} className="text-foreground hover:text-primary transition-colors font-bold">Contato</button>
           </div>
 
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-foreground p-2 hover:bg-accent rounded-md transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center gap-4">
+            <Link to="/login">
+              <Button variant="outline" size="sm" className="gap-2">
+                <LogIn className="h-4 w-4" />
+                <span className="hidden md:inline">Área Restrita</span>
+              </Button>
+            </Link>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden text-foreground p-2 hover:bg-accent rounded-md transition-colors"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {isMobileMenuOpen && (
