@@ -1,115 +1,69 @@
 
 
-# Modernizacao da UI - Alpha Cross
+# Painel Administrativo Completo
 
 ## Visao Geral
 
-Vou aplicar uma reformulacao visual em todo o site para dar um aspecto mais moderno, premium e imersivo -- mantendo a identidade espartana/CrossFit da marca. As mudancas abrangem a landing page publica, as telas de login, dashboard do cliente e painel admin.
+Transformar o painel admin atual (que e basicamente uma lista de usuarios) em um hub administrativo completo com navegacao lateral e multiplas secoes organizadas.
 
----
+## Estrutura do Novo Painel
 
-## Mudancas Propostas
+O admin tera uma **sidebar de navegacao** fixa com as seguintes secoes:
 
-### 1. Sistema de Design (CSS/Tailwind)
+1. **Dashboard** (visao geral) - Resumo com cards de estatisticas (total usuarios, ativos, inativos, admins, treinos da semana, ultimo login)
+2. **Usuarios** - Listagem completa com busca, filtros por status/plano, criar/editar/resetar senha (ja existe, sera integrado)
+3. **Treinos** - Gerenciamento semanal de treinos (ja existe em `/admin/treinos`, sera integrado no layout)
+4. **Insights** - Analytics de treinos (ja existe em `/admin/insights`, sera integrado)
+5. **Logs de Auditoria** - Visualizacao dos logs de acoes administrativas (tabela `audit_logs` ja existe)
+6. **Meu Perfil** - Dados do admin logado
 
-- Aumentar o `--radius` de `0.25rem` para `0.75rem` para cards e botoes mais arredondados e modernos
-- Adicionar efeito de **glassmorphism** (backdrop-blur + semi-transparencia) nos cards e header
-- Criar novas animacoes: `slide-up`, `blur-in`, e `float` para elementos decorativos
-- Adicionar gradiente de texto mais sofisticado e sombras suaves nos titulos
-- Melhorar spacing e tipografia geral
+## Mudancas na Interface
 
-### 2. Header (Navegacao)
+- Criar um **layout compartilhado** (`AdminLayout.tsx`) com sidebar + header + area de conteudo
+- Sidebar colapsavel no mobile (hamburger menu)
+- Header com nome do admin, foto/avatar e botao de logout
+- Navegacao por abas/sidebar ao inves de paginas separadas com headers repetidos
 
-- Aplicar glassmorphism completo no header (`bg-background/60 backdrop-blur-xl`)
-- Adicionar indicador ativo nos links de navegacao (underline animado)
-- Botao "Area Restrita" com borda gradient ao inves de outline simples
-- Menu mobile com animacao slide-in suave
+## Secao: Logs de Auditoria (nova)
 
-### 3. Hero Section
-
-- Adicionar particulas/elementos decorativos flutuantes (linhas diagonais ou formas geometricas sutis em CSS)
-- Tipografia mais dramatica com `text-shadow` para profundidade
-- Botoes com efeito hover mais sofisticado (scale + glow)
-- Badge/chip acima do titulo principal (ex: "CROSSFIT DE ELITE")
-- Scroll indicator mais elegante
-
-### 4. Secao Legado (Valores)
-
-- Cards com efeito glassmorphism e borda gradient sutil no hover
-- Icones dentro de circulos com animacao de pulso sutil
-- Numero/indice decorativo em cada card (01, 02, 03, 04)
-- Linha decorativa separando o titulo da descricao
-
-### 5. Secao Programas
-
-- Card destacado (Legiao Alpha) com animacao de brilho (shimmer border)
-- Adicionar preco ou indicador visual de nivel
-- Hover com elevacao mais pronunciada (translate-y + shadow)
-- Badge "Mais Popular" com animacao sutil
-
-### 6. Galeria
-
-- Hover com overlay mostrando o nome/legenda da foto
-- Layout com variacao de tamanhos (algumas fotos maiores que outras usando grid spans)
-- Animacao de entrada escalonada (staggered) ao scrollar
-
-### 7. Contato
-
-- Formulario com campos que possuem animacao de foco (label que sobe)
-- Cards de contato com icones maiores e hover mais expressivo
-- Mapa embed ou imagem de fundo sutil
-
-### 8. Footer
-
-- Layout mais rico com colunas (links rapidos, contato, redes sociais)
-- Logo maior e tagline
-- Separador gradient ao inves de borda simples
-
-### 9. Tela de Login
-
-- Adicionar imagem de fundo com overlay (reutilizar hero-gym.webp)
-- Card de login com glassmorphism
-- Animacao de entrada (fade-in + scale-in)
-
-### 10. Dashboard do Cliente
-
-- Header com glassmorphism
-- Cards com hover elevado e gradientes sutis nos icones
-- Cards de treino com visual mais compacto e tags coloridas maiores
-- Secao de avisos com design diferenciado (borda lateral colorida)
-
-### 11. Painel Admin
-
-- Header unificado com navegacao lateral ou tabs
-- Stats cards com micro-animacoes (contagem crescente)
-- Tabela de usuarios com linhas alternadas e hover mais suave
-- Botoes de acao com tooltips
-
----
+Exibir a tabela `audit_logs` com:
+- Data/hora da acao
+- Quem fez (actor)
+- Tipo de acao (create_user, update_user, reset_password)
+- Usuario alvo
+- Detalhes em JSON expandivel
 
 ## Detalhes Tecnicos
 
-### Arquivos que serao modificados:
+### Arquivos novos:
+- `src/components/AdminLayout.tsx` - Layout com sidebar, header e outlet
+- `src/pages/AdminAuditLogs.tsx` - Pagina de logs de auditoria
+- `src/pages/AdminProfile.tsx` - Perfil do admin
+- `src/pages/AdminOverview.tsx` - Dashboard resumo (extraido do atual AdminDashboard)
 
-| Arquivo | Tipo de mudanca |
-|---|---|
-| `src/index.css` | Novas variaveis CSS, classes utilitarias, glassmorphism, animacoes |
-| `tailwind.config.ts` | Novas animacoes, keyframes, cores extras |
-| `src/components/Header.tsx` | Glassmorphism, links animados, menu mobile melhorado |
-| `src/components/Hero.tsx` | Badge, tipografia, elementos decorativos, botoes melhorados |
-| `src/components/Legacy.tsx` | Cards glass, numeros decorativos, animacoes |
-| `src/components/Programs.tsx` | Shimmer border, hover elevado, badges |
-| `src/components/Gallery.tsx` | Grid variado, overlay com legendas, entrada animada |
-| `src/components/Contact.tsx` | Campos animados, cards de contato melhorados |
-| `src/components/Footer.tsx` | Layout multi-coluna, separador gradient |
-| `src/pages/Login.tsx` | Background image, glassmorphism, animacao de entrada |
-| `src/pages/ClientDashboard.tsx` | Cards modernizados, header glass, treinos visuais |
-| `src/pages/AdminDashboard.tsx` | Stats animados, tabela melhorada |
-| `src/pages/AdminWorkouts.tsx` | Cards de treino refinados |
+### Arquivos modificados:
+- `src/App.tsx` - Reorganizar rotas admin para usar layout aninhado
+- `src/pages/AdminDashboard.tsx` - Refatorar para usar AdminLayout
+- `src/pages/AdminWorkouts.tsx` - Remover header duplicado, usar layout
+- `src/pages/AdminInsights.tsx` - Remover header duplicado, usar layout
+- `src/pages/AdminUserForm.tsx` - Usar layout compartilhado
 
-### Abordagem:
-- Todas as mudancas sao puramente visuais (CSS/Tailwind + JSX)
-- Nenhuma mudanca em logica de negocio ou banco de dados
-- Compatibilidade total com mobile mantida
-- Performance preservada (animacoes via CSS, sem bibliotecas extras)
+### Rota da sidebar:
+- `/admin` - Overview/Dashboard
+- `/admin/usuarios` - Lista de usuarios (conteudo atual do AdminDashboard)
+- `/admin/usuarios/novo` - Novo usuario
+- `/admin/usuarios/:id` - Editar usuario
+- `/admin/treinos` - Treinos semanais
+- `/admin/treinos/novo` - Novo treino
+- `/admin/treinos/:id` - Editar treino
+- `/admin/treinos/importar` - Importar treinos
+- `/admin/insights` - Analytics
+- `/admin/auditoria` - Logs
+- `/admin/perfil` - Perfil do admin
+
+### Edge function `admin-users`:
+- Adicionar action `audit-logs` para listar logs com dados de perfil do actor
+
+### Banco de dados:
+- Nenhuma migracao necessaria - todas as tabelas ja existem (`profiles`, `user_roles`, `audit_logs`, `weekly_workouts`)
 
