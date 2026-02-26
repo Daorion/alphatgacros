@@ -6,6 +6,7 @@ import {
   Users,
   Dumbbell,
   BarChart3,
+  FileBarChart,
   ScrollText,
   UserCircle,
   LogOut,
@@ -20,6 +21,7 @@ const navItems = [
   { title: "Usuários", url: "/admin/usuarios", icon: Users },
   { title: "Treinos", url: "/admin/treinos", icon: Dumbbell },
   { title: "Insights", url: "/admin/insights", icon: BarChart3 },
+  { title: "Relatórios", url: "/admin/relatorios", icon: FileBarChart },
   { title: "Auditoria", url: "/admin/auditoria", icon: ScrollText },
   { title: "Meu Perfil", url: "/admin/perfil", icon: UserCircle },
 ];
