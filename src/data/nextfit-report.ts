@@ -194,3 +194,93 @@ export const CHECKIN_STATUS = [
   { status: "Inativo", count: 42 },
   { status: "Suspenso", count: 8 },
 ];
+
+// === CLIENTES FALTANTES (sem check-in) ===
+export const MISSING_CLIENTS = [
+  { name: "RAFAEL HILBERT", phone: "(65) 999474480", daysAbsent: 408, lastCheckin: "14/01/2025", contractExpiry: "02/05/2026" },
+  { name: "Edilson Leão Ortiz", phone: "(65) 998441353", daysAbsent: 335, lastCheckin: "28/03/2025", contractExpiry: "27/04/2026" },
+  { name: "Lauane Alice da Silva Barbosa", phone: "(65) 992705844", daysAbsent: 121, lastCheckin: "28/10/2025", contractExpiry: "15/04/2026" },
+  { name: "Eliamara Morais Da Silva", phone: "(65) 998003964", daysAbsent: 107, lastCheckin: "11/11/2025", contractExpiry: "29/04/2026" },
+  { name: "Marcio Osvaldo Lima Magalhães", phone: "(11) 944790307", daysAbsent: 87, lastCheckin: "01/12/2025", contractExpiry: "12/04/2026" },
+  { name: "LUIS FABIANO DE FREITAS GOMES", phone: "(65) 992922650", daysAbsent: 49, lastCheckin: "08/01/2026", contractExpiry: "23/08/2026" },
+  { name: "Caroline Oliveira da Costa", phone: "(65) 999577382", daysAbsent: 41, lastCheckin: "16/01/2026", contractExpiry: "06/07/2026" },
+  { name: "LUÍZ HENRIQUE HILBERT C DA SILVA", phone: "(65) 999259877", daysAbsent: 37, lastCheckin: "20/01/2026", contractExpiry: "06/05/2026" },
+  { name: "ARTHUR WALDIR VINHAS QUEIROZ", phone: "(65) 999085584", daysAbsent: 36, lastCheckin: "21/01/2026", contractExpiry: "14/07/2026" },
+  { name: "AGNALDO M DA SILVA ALMEIDA", phone: "(65) 999180212", daysAbsent: 36, lastCheckin: "21/01/2026", contractExpiry: "31/03/2026" },
+  { name: "LUIS CESAR SIQUEIRA ALVES", phone: "(65) 996509892", daysAbsent: 23, lastCheckin: "03/02/2026", contractExpiry: "07/07/2026" },
+  { name: "TATIANE GRAMINHO", phone: "(65) 999418404", daysAbsent: 22, lastCheckin: "04/02/2026", contractExpiry: "20/04/2026" },
+  { name: "Lucivone Ana de Faria", phone: "(65) 992731842", daysAbsent: 21, lastCheckin: "05/02/2026", contractExpiry: "03/08/2026" },
+  { name: "LILIAN RIBEIRO LOURENCO RANGEL", phone: "(65) 999876445", daysAbsent: 20, lastCheckin: "06/02/2026", contractExpiry: "15/06/2026" },
+  { name: "JOSE LUIZ TORRES", phone: "(65) 999094095", daysAbsent: 17, lastCheckin: "09/02/2026", contractExpiry: "26/03/2026" },
+  { name: "Diogo Gurgel", phone: "(65) 998081250", daysAbsent: 16, lastCheckin: "10/02/2026", contractExpiry: "26/02/2026" },
+  { name: "Milene Cristina da Silva Costa", phone: "(65) 99259440", daysAbsent: 14, lastCheckin: "12/02/2026", contractExpiry: "15/03/2026" },
+  { name: "FERNANDO KERKHOFF", phone: "(65) 999902323", daysAbsent: 14, lastCheckin: "12/02/2026", contractExpiry: "07/07/2026" },
+  { name: "Mariana Falcão Heemann", phone: "(65) 996007775", daysAbsent: 10, lastCheckin: "16/02/2026", contractExpiry: "11/04/2026" },
+  { name: "Ingrid Lorraine da Silva Amorim", phone: "(65) 996730928", daysAbsent: 10, lastCheckin: "16/02/2026", contractExpiry: "01/04/2026" },
+  { name: "Ueslaine Gonçalves da Silva", phone: "(65) 999785531", daysAbsent: 9, lastCheckin: "17/02/2026", contractExpiry: "21/04/2026" },
+  { name: "CINTIA VIVIANE ALVES", phone: "(65) 999750088", daysAbsent: 9, lastCheckin: "17/02/2026", contractExpiry: "16/08/2026" },
+  { name: "ANA LUCIA MENDES DE SOUZA", phone: "(65) 984347115", daysAbsent: 8, lastCheckin: "18/02/2026", contractExpiry: "21/04/2026" },
+  { name: "Bruna Aparecida Amorim Rodrigues", phone: "(65) 998024920", daysAbsent: 8, lastCheckin: "18/02/2026", contractExpiry: "22/04/2026" },
+  { name: "BRISA CÂNDIDO RODRIGUES", phone: "(65) 999365046", daysAbsent: 8, lastCheckin: "18/02/2026", contractExpiry: "04/07/2026" },
+  { name: "Carine Martins De Oliveira", phone: "(99) 999999", daysAbsent: 7, lastCheckin: "19/02/2026", contractExpiry: "26/02/2026" },
+  { name: "PATRICIA SATIE KAWASAKI", phone: "(65) 996363826", daysAbsent: 6, lastCheckin: "20/02/2026", contractExpiry: "19/04/2026" },
+  { name: "JACKELINE ZYGOSKI", phone: "(65) 984098837", daysAbsent: 6, lastCheckin: "20/02/2026", contractExpiry: "18/07/2026" },
+  { name: "Érika de Souza Miguel", phone: "(69) 993448573", daysAbsent: 6, lastCheckin: "20/02/2026", contractExpiry: "20/07/2026" },
+  { name: "Jamys da Silva Mota", phone: "(65) 999691076", daysAbsent: 6, lastCheckin: "20/02/2026", contractExpiry: "26/03/2026" },
+];
+
+// === ANÁLISE DE CONTRATOS (real do NextFit) ===
+export const CONTRACT_ANALYSIS = [
+  { label: "CrossFit - Semestral Antigos", count: 63 },
+  { label: "Wellhub - Funcional/HIIT", count: 58 },
+  { label: "Permutas", count: 49 },
+  { label: "Wellhub (2ª entrada)", count: 39 },
+  { label: "PLANO SEMESTRAL 2026", count: 26 },
+  { label: "Cross Fit - Policia", count: 11 },
+  { label: "PLANO MENSAL 2026", count: 10 },
+  { label: "CrossFit - Semestral", count: 8 },
+  { label: "3x/Semana Recorrência", count: 7 },
+  { label: "PLANO 3X/SEMANA 2026", count: 6 },
+  { label: "Semestral Recorrência", count: 5 },
+  { label: "PLANO TRIMESTRAL 2026", count: 5 },
+  { label: "Alunos Antigos", count: 3 },
+  { label: "TotalPass", count: 4 },
+  { label: "Desconto Especial", count: 2 },
+  { label: "Trimestral Recorrência", count: 2 },
+];
+
+// === ACESSO - MÉTODO DE RECONHECIMENTO ===
+export const ACCESS_METHODS = [
+  { method: "Biometria", count: 1680 },
+  { method: "Teclado", count: 167 },
+];
+
+// === CHECK-INS DIÁRIOS FEV/2026 ===
+export const DAILY_CHECKINS_FEB = [
+  { day: 1, count: 18 },
+  { day: 2, count: 22 },
+  { day: 3, count: 28 },
+  { day: 4, count: 30 },
+  { day: 5, count: 32 },
+  { day: 6, count: 26 },
+  { day: 7, count: 8 },
+  { day: 8, count: 15 },
+  { day: 9, count: 29 },
+  { day: 10, count: 31 },
+  { day: 11, count: 27 },
+  { day: 12, count: 33 },
+  { day: 13, count: 30 },
+  { day: 14, count: 9 },
+  { day: 15, count: 14 },
+  { day: 16, count: 28 },
+  { day: 17, count: 32 },
+  { day: 18, count: 35 },
+  { day: 19, count: 30 },
+  { day: 20, count: 38 },
+  { day: 21, count: 10 },
+  { day: 22, count: 16 },
+  { day: 23, count: 40 },
+  { day: 24, count: 34 },
+  { day: 25, count: 28 },
+  { day: 26, count: 25 },
+];
