@@ -18,6 +18,7 @@ import AdminWorkouts from "./pages/AdminWorkouts";
 import AdminWorkoutForm from "./pages/AdminWorkoutForm";
 import AdminImportWorkouts from "./pages/AdminImportWorkouts";
 import AdminInsights from "./pages/AdminInsights";
+import AdminRelatorios from "./pages/AdminRelatorios";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import AdminProfile from "./pages/AdminProfile";
 import NotFound from "./pages/NotFound";
@@ -76,6 +77,7 @@ const App = () => (
                 <Route path="treinos/:id" element={<AdminWorkoutForm />} />
                 <Route path="treinos/importar" element={<AdminImportWorkouts />} />
                 <Route path="insights" element={<AdminInsights />} />
+                <Route path="relatorios" element={<AdminRelatorios />} />
                 <Route path="auditoria" element={<AdminAuditLogs />} />
                 <Route path="perfil" element={<AdminProfile />} />
               </Route>
