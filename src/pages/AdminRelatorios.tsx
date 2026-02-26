@@ -6,21 +6,25 @@ import {
 } from "@/components/ui/table";
 import {
   Users, UserCheck, UserX, AlertTriangle, Clock, Trophy,
-  TrendingDown, CreditCard, BarChart3, PieChart,
+  TrendingDown, CreditCard, BarChart3, PieChart, UserMinus,
+  Fingerprint, CalendarDays,
 } from "lucide-react";
 import {
   SUMMARY, TOP_CHECKINS, FREQUENCY_BY_HOUR, GENDER_DISTRIBUTION,
   AGE_DISTRIBUTION, CONTRACT_TYPES, ABANDONMENT_RISK, CHURN_REASONS,
   CHURN_BY_MONTH, PAYMENT_METHODS, CHECKIN_STATUS, REPORT_DATE,
+  MISSING_CLIENTS, CONTRACT_ANALYSIS, ACCESS_METHODS, DAILY_CHECKINS_FEB,
 } from "@/data/nextfit-report";
 
-type Tab = "resumo" | "frequencia" | "ranking" | "risco" | "evasao" | "perfil" | "financeiro";
+type Tab = "resumo" | "frequencia" | "ranking" | "risco" | "ausentes" | "contratos" | "evasao" | "perfil" | "financeiro";
 
 const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: "resumo", label: "Resumo", icon: BarChart3 },
   { key: "ranking", label: "Ranking", icon: Trophy },
   { key: "frequencia", label: "Frequência", icon: Clock },
+  { key: "contratos", label: "Contratos", icon: CalendarDays },
   { key: "perfil", label: "Perfil", icon: PieChart },
+  { key: "ausentes", label: "Ausentes", icon: UserMinus },
   { key: "risco", label: "Risco", icon: AlertTriangle },
   { key: "evasao", label: "Evasão", icon: TrendingDown },
   { key: "financeiro", label: "Financeiro", icon: CreditCard },
@@ -59,7 +63,9 @@ const AdminRelatorios = () => {
       {tab === "resumo" && <ResumoTab />}
       {tab === "ranking" && <RankingTab />}
       {tab === "frequencia" && <FrequenciaTab />}
+      {tab === "contratos" && <ContratosTab />}
       {tab === "perfil" && <PerfilTab />}
+      {tab === "ausentes" && <AusentesTab />}
       {tab === "risco" && <RiscoTab />}
       {tab === "evasao" && <EvasaoTab />}
       {tab === "financeiro" && <FinanceiroTab />}
@@ -418,6 +424,134 @@ const FinanceiroTab = () => {
                   style={{ width: `${(p.total / totalRevenue) * 100}%` }}
                 />
               </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// === AUSENTES ===
+const AusentesTab = () => (
+  <div className="space-y-4">
+    <Card className="p-4 bg-yellow-500/10 border-yellow-500/20">
+      <div className="flex items-center gap-2">
+        <UserMinus className="h-5 w-5 text-yellow-500" />
+        <span className="text-sm font-bold text-yellow-500">
+          {MISSING_CLIENTS.length} alunos com contrato ativo sem frequentar
+        </span>
+      </div>
+    </Card>
+
+    <Card className="p-6 bg-card border-border">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Aluno</TableHead>
+              <TableHead>Telefone</TableHead>
+              <TableHead className="text-right">Dias Ausente</TableHead>
+              <TableHead>Último Check-in</TableHead>
+              <TableHead>Venc. Contrato</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {MISSING_CLIENTS.map((c) => (
+              <TableRow key={c.name}>
+                <TableCell className="font-medium">{c.name}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{c.phone}</TableCell>
+                <TableCell className="text-right">
+                  <Badge variant={c.daysAbsent > 30 ? "destructive" : "secondary"} className="font-bold">
+                    {c.daysAbsent}d
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{c.lastCheckin}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{c.contractExpiry}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  </div>
+);
+
+// === CONTRATOS ===
+const ContratosTab = () => {
+  const totalContracts = CONTRACT_ANALYSIS.reduce((a, b) => a + b.count, 0);
+  const maxContract = Math.max(...CONTRACT_ANALYSIS.map((c) => c.count));
+  const maxDaily = Math.max(...DAILY_CHECKINS_FEB.map((d) => d.count));
+
+  return (
+    <div className="space-y-6">
+      {/* Resumo de contratos */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <Card className="p-4 bg-card border-border text-center">
+          <CalendarDays className="h-5 w-5 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{totalContracts}</p>
+          <p className="text-[10px] text-muted-foreground">Contratos Ativos</p>
+        </Card>
+        <Card className="p-4 bg-card border-border text-center">
+          <Fingerprint className="h-5 w-5 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">
+            {((ACCESS_METHODS[0].count / (ACCESS_METHODS[0].count + ACCESS_METHODS[1].count)) * 100).toFixed(0)}%
+          </p>
+          <p className="text-[10px] text-muted-foreground">Acesso por Biometria</p>
+        </Card>
+        <Card className="p-4 bg-card border-border text-center">
+          <Users className="h-5 w-5 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-black text-foreground">{ACCESS_METHODS[0].count + ACCESS_METHODS[1].count}</p>
+          <p className="text-[10px] text-muted-foreground">Acessos Registrados</p>
+        </Card>
+      </div>
+
+      {/* Análise de contratos */}
+      <Card className="p-6 bg-card border-border">
+        <h3 className="text-base font-black text-foreground mb-4">📄 Análise de Contratos (NextFit)</h3>
+        <div className="space-y-2">
+          {CONTRACT_ANALYSIS.map((c) => (
+            <div key={c.label} className="flex items-center gap-3">
+              <span className="text-xs text-foreground flex-1 truncate">{c.label}</span>
+              <div className="w-40 bg-muted rounded-full h-2.5">
+                <div className="bg-primary h-2.5 rounded-full" style={{ width: `${(c.count / maxContract) * 100}%` }} />
+              </div>
+              <span className="text-xs font-bold text-muted-foreground w-8 text-right">{c.count}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Check-ins diários Fev */}
+      <Card className="p-6 bg-card border-border">
+        <h3 className="text-base font-black text-foreground mb-4">📅 Check-ins Diários — Fevereiro 2026</h3>
+        <div className="flex items-end gap-1 h-48">
+          {DAILY_CHECKINS_FEB.map((d) => {
+            const height = (d.count / maxDaily) * 100;
+            const isWeekend = [7, 8, 14, 15, 21, 22].includes(d.day);
+            return (
+              <div key={d.day} className="flex-1 flex flex-col items-center justify-end h-full">
+                <span className="text-[8px] font-bold text-foreground mb-1">{d.count}</span>
+                <div
+                  className={`w-full rounded-t transition-all ${isWeekend ? "bg-muted-foreground/30" : "bg-primary"}`}
+                  style={{ height: `${height}%` }}
+                />
+                <span className="text-[8px] text-muted-foreground mt-1">{d.day}</span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-2 text-center">Barras claras = fins de semana</p>
+      </Card>
+
+      {/* Método de acesso */}
+      <Card className="p-6 bg-card border-border">
+        <h3 className="text-base font-black text-foreground mb-4">🔐 Método de Acesso</h3>
+        <div className="flex gap-8">
+          {ACCESS_METHODS.map((a) => (
+            <div key={a.method} className="text-center">
+              <p className="text-3xl font-black text-foreground">{a.count.toLocaleString("pt-BR")}</p>
+              <p className="text-xs text-muted-foreground">{a.method}</p>
             </div>
           ))}
         </div>
