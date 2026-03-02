@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -20,6 +21,7 @@ const navItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Usuários", url: "/admin/usuarios", icon: Users },
   { title: "Treinos", url: "/admin/treinos", icon: Dumbbell },
+  { title: "Financeiro", url: "/admin/financeiro", icon: Wallet },
   { title: "Insights", url: "/admin/insights", icon: BarChart3 },
   { title: "Relatórios", url: "/admin/relatorios", icon: FileBarChart },
   { title: "Auditoria", url: "/admin/auditoria", icon: ScrollText },

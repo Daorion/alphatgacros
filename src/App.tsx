@@ -21,6 +21,7 @@ import AdminInsights from "./pages/AdminInsights";
 import AdminRelatorios from "./pages/AdminRelatorios";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import AdminProfile from "./pages/AdminProfile";
+import AdminFinanceiro from "./pages/AdminFinanceiro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const App = () => (
                 <Route path="treinos/novo" element={<AdminWorkoutForm />} />
                 <Route path="treinos/:id" element={<AdminWorkoutForm />} />
                 <Route path="treinos/importar" element={<AdminImportWorkouts />} />
+                <Route path="financeiro" element={<AdminFinanceiro />} />
                 <Route path="insights" element={<AdminInsights />} />
                 <Route path="relatorios" element={<AdminRelatorios />} />
                 <Route path="auditoria" element={<AdminAuditLogs />} />
