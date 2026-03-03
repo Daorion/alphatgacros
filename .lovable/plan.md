@@ -1,53 +1,53 @@
 
 
-## Painel de Gerenciamento Financeiro da Academia
+## Plano: Preparar código para migração a novo projeto com Supabase externo
 
-### Visão Geral
-Criar uma nova seção administrativa completa (`/admin/financeiro`) com um painel financeiro manual onde a gestora pode registrar receitas, despesas, contas bancárias e gerar relatórios comparativos.
+### Contexto
+O código já está bem estruturado e usa variáveis de ambiente (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) para conectar ao backend. As edge functions usam `Deno.env.get("SUPABASE_URL")` etc., que são automaticamente injetados pelo Supabase. Não há URLs ou chaves hardcoded no código.
 
-### Tabelas no Banco de Dados (4 novas tabelas)
+### O que precisa ser feito
 
-1. **`bank_accounts`** — Contas bancárias da academia
-   - `id`, `name` (ex: "Conta PJ Itaú"), `bank_name`, `account_type` (corrente/poupança/caixa), `balance`, `color` (para gráficos), `is_active`, `created_at`
+**1. Gerar um SQL consolidado de migração**
+Criar um arquivo `supabase/migrations/00000000000000_full_schema.sql` que consolida todas as 5 migrações existentes em uma única, para você rodar no seu Supabase externo. Isso inclui:
+- Enum `app_role`
+- Tabelas: `profiles`, `user_roles`, `murph_registrations`, `audit_logs`, `weekly_workouts`, `bank_accounts`, `financial_categories`, `recurring_transactions`, `financial_transactions`
+- Todas as RLS policies
+- Functions: `has_role`, `handle_new_user`, `update_updated_at_column`
+- Trigger `on_auth_user_created`
+- Storage bucket `receipts`
+- Seed de categorias financeiras
 
-2. **`financial_categories`** — Categorias de receita/despesa
-   - `id`, `name` (ex: "Aluguel", "Energia", "Salários"), `type` (receita/despesa), `color`, `is_active`, `created_at`
+**2. Atualizar `supabase/config.toml`**
+Remover o `project_id` do Lovable Cloud para que o arquivo fique genérico e pronto para apontar ao seu projeto.
 
-3. **`financial_transactions`** — Lançamentos individuais
-   - `id`, `description`, `amount`, `type` (receita/despesa), `category_id` (FK), `bank_account_id` (FK), `date`, `is_recurring`, `recurring_id` (FK nullable), `payment_method`, `notes`, `created_by` (user id), `created_at`
+**3. Criar `.env.example`**
+Criar um arquivo modelo para que no novo projeto você só precise preencher com as credenciais do seu Supabase:
+```
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sua-anon-key
+```
 
-4. **`recurring_transactions`** — Gastos/receitas recorrentes (templates)
-   - `id`, `description`, `amount`, `type`, `category_id` (FK), `bank_account_id` (FK), `frequency` (mensal/semanal/anual), `day_of_month`, `start_date`, `end_date`, `is_active`, `created_by`, `created_at`
+**4. Ajustar o `WorkoutAIAssistant.tsx`**
+O componente usa `VITE_SUPABASE_PUBLISHABLE_KEY` como Bearer token para chamar a edge function. Isso precisa ser trocado para usar o token de sessão do usuário (como as outras chamadas fazem), garantindo compatibilidade.
 
-Todas com RLS restrito a admins.
+**5. Documentar o processo de setup**
+Adicionar um `SETUP.md` com instruções claras:
+1. Criar projeto no Supabase
+2. Rodar a migração consolidada no SQL Editor
+3. Preencher `.env` com URL e anon key
+4. Configurar secrets nas edge functions (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `LOVABLE_API_KEY`)
+5. Deploy das edge functions
 
-### Estrutura da Página (`/admin/financeiro`)
+### Arquivos que serão criados/alterados
 
-**7 abas:**
+| Arquivo | Ação |
+|---|---|
+| `supabase/migrations/00000000000000_full_schema.sql` | Criar (SQL consolidado) |
+| `.env.example` | Criar |
+| `SETUP.md` | Criar |
+| `supabase/config.toml` | Limpar project_id |
+| `src/components/WorkoutAIAssistant.tsx` | Corrigir auth header |
 
-1. **Visão Geral** — Cards de resumo (receita total mês, despesa total mês, saldo, variação vs mês anterior) + gráfico de barras receita vs despesa últimos 6 meses + saldo por conta bancária
-
-2. **Lançamentos** — Tabela completa com filtros (período, categoria, tipo, conta), botão "Novo Lançamento" abrindo dialog com formulário, edição e exclusão inline
-
-3. **Recorrentes** — Lista de despesas/receitas recorrentes ativas, criar/editar/pausar, indicador de próximo vencimento
-
-4. **Categorias** — CRUD de categorias com cores, exibição de quanto cada categoria representa no mês
-
-5. **Contas Bancárias** — CRUD de contas, saldo atual de cada, histórico de movimentação por conta
-
-6. **Análises** — Gráfico de pizza despesas por categoria, evolução mensal (linha), comparativo mês a mês, indicadores (ticket médio, maior despesa, dia com mais gastos)
-
-7. **Exportar** — Selecionar período e gerar CSV com todos os lançamentos filtrados
-
-### Navegação
-- Adicionar item "Financeiro" com ícone `Wallet` no sidebar do `AdminLayout.tsx`
-- Rota `/admin/financeiro` no `App.tsx`
-
-### Componentes
-- `src/pages/AdminFinanceiro.tsx` — Página principal com as 7 abas
-- Reutiliza componentes UI existentes (Card, Table, Dialog, Badge, charts do Recharts)
-
-### Segurança
-- RLS em todas as tabelas: somente admins podem ler/escrever
-- `created_by` registra quem fez cada lançamento
+### Nota importante sobre Edge Functions
+As edge functions (`admin-users`, `import-workouts`, `workout-ai-assistant`) já usam `Deno.env.get()` para acessar as variáveis, então funcionarão automaticamente no novo Supabase desde que os secrets estejam configurados. A `workout-ai-assistant` usa `LOVABLE_API_KEY` para o gateway de IA da Lovable — no novo ambiente, você precisará de uma chave de API de IA alternativa (ex: Google Gemini diretamente) ou manter o gateway Lovable se disponível.
 
