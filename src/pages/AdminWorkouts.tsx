@@ -108,6 +108,41 @@ const AdminWorkouts = () => {
     }
   };
 
+  const handleAIApply = useCallback(async (suggestion: WorkoutSuggestion) => {
+    if (suggestion.day_of_week === undefined) {
+      toast({ title: "Erro", description: "A IA não especificou o dia da semana.", variant: "destructive" });
+      return;
+    }
+    const existing = workoutByDay.get(suggestion.day_of_week);
+    const payload = {
+      week_start: weekStartStr,
+      day_of_week: suggestion.day_of_week,
+      title: suggestion.title,
+      intensity: suggestion.intensity,
+      tags: suggestion.tags,
+      warmup: suggestion.warmup,
+      activation: suggestion.activation || null,
+      strength: suggestion.strength || null,
+      wod: suggestion.wod,
+      notes: suggestion.notes || null,
+      created_by: user?.id || null,
+    };
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase.from("weekly_workouts").update(payload).eq("id", existing.id));
+    } else {
+      ({ error } = await supabase.from("weekly_workouts").insert(payload));
+    }
+
+    if (error) {
+      toast({ title: "Erro", description: "Não foi possível salvar o treino.", variant: "destructive" });
+    } else {
+      toast({ title: "Treino salvo!", description: `${DAY_NAMES[suggestion.day_of_week]} atualizado.` });
+      fetchWorkouts();
+    }
+  }, [weekStartStr, workouts, user, toast]);
+
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
 
