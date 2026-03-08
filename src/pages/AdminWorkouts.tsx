@@ -225,6 +225,7 @@ const AdminWorkouts = () => {
         open={aiOpen}
         onOpenChange={setAiOpen}
         weekStart={weekStartStr}
+        onApply={handleAIApply}
       />
     </div>
   );
