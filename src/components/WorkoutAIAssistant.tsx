@@ -146,8 +146,10 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
       if (isToolCall && toolCallArgs) {
         try {
           const suggestion = JSON.parse(toolCallArgs) as WorkoutSuggestion;
-          setPendingSuggestion(suggestion);
-          upsertAssistant("\n\n✅ **Treino gerado!** Clique em \"Aplicar no Formulário\" para preencher automaticamente.");
+         setPendingSuggestion(suggestion);
+          const DAY_NAMES = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+          const dayLabel = suggestion.day_of_week !== undefined ? ` para **${DAY_NAMES[suggestion.day_of_week]}**` : "";
+          upsertAssistant(`\n\n✅ **Treino gerado${dayLabel}!** Clique em "Aplicar" para salvar.`);
         } catch (e) {
           console.error("Failed to parse tool call:", e);
         }
