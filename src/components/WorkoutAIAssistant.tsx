@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Bot, User, Sparkles, CheckCircle2 } from "lucide-react";
+import { Send, Bot, User, Sparkles, CheckCircle2, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,8 +36,59 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [pendingSuggestion, setPendingSuggestion] = useState<WorkoutSuggestion | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionClass) {
+      toast({ title: "Não suportado", description: "Seu navegador não suporta reconhecimento de voz. Use Chrome ou Edge.", variant: "destructive" });
+      return;
+    }
+
+    const recognition = new SpeechRecognitionClass();
+    recognition.lang = "pt-BR";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognitionRef.current = recognition;
+
+    let finalTranscript = "";
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + " ";
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      setInput(finalTranscript + interim);
+    };
+
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+      if (event.error === "not-allowed") {
+        toast({ title: "Microfone bloqueado", description: "Permita o acesso ao microfone nas configurações do navegador.", variant: "destructive" });
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+    setIsListening(true);
+  }, [isListening, toast]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -258,18 +309,28 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
         {/* Input */}
         <div className="px-4 py-3 border-t border-border">
           <div className="flex gap-2">
+            <Button
+              size="icon"
+              variant={isListening ? "default" : "outline"}
+              onClick={toggleListening}
+              disabled={isLoading}
+              className={`flex-shrink-0 ${isListening ? "bg-destructive hover:bg-destructive/90 animate-pulse" : ""}`}
+              title={isListening ? "Parar gravação" : "Falar com o assistente"}
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ex: Crie um treino de força para segunda..."
+              placeholder={isListening ? "Ouvindo... fale agora 🎙️" : "Ex: Crie um treino de força para segunda..."}
               className="min-h-[44px] max-h-[120px] resize-none bg-background border-border text-sm"
               rows={1}
               disabled={isLoading}
             />
             <Button
               size="icon"
-              onClick={() => send(input)}
+              onClick={() => { recognitionRef.current?.stop(); setIsListening(false); send(input); }}
               disabled={isLoading || !input.trim()}
               className="flex-shrink-0"
             >
