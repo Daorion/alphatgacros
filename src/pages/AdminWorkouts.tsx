@@ -108,6 +108,15 @@ const AdminWorkouts = () => {
     }
   };
 
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+
+  const weekLabel = workouts[0]?.week_label || 
+    `${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} → ${weekEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}`;
+
+  const workoutByDay = new Map<number, Workout>();
+  workouts.forEach((w) => workoutByDay.set(w.day_of_week, w));
+
   const handleAIApply = useCallback(async (suggestion: WorkoutSuggestion) => {
     if (suggestion.day_of_week === undefined) {
       toast({ title: "Erro", description: "A IA não especificou o dia da semana.", variant: "destructive" });
@@ -142,15 +151,6 @@ const AdminWorkouts = () => {
       fetchWorkouts();
     }
   }, [weekStartStr, workouts, user, toast]);
-
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekEnd.getDate() + 6);
-
-  const weekLabel = workouts[0]?.week_label || 
-    `${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} → ${weekEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}`;
-
-  const workoutByDay = new Map<number, Workout>();
-  workouts.forEach((w) => workoutByDay.set(w.day_of_week, w));
 
   return (
     <div>
