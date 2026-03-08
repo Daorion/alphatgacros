@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import WorkoutAIAssistant from "@/components/WorkoutAIAssistant";
+import WorkoutAIAssistant, { WorkoutSuggestion } from "@/components/WorkoutAIAssistant";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Workout {
   id: string;
