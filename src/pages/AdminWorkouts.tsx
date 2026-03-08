@@ -62,6 +62,7 @@ const WorkoutSection = ({ icon, label, content }: { icon: string; label: string;
 const AdminWorkouts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
