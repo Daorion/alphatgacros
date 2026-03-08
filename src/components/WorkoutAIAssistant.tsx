@@ -49,12 +49,12 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
     }
 
     const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+    if (!SpeechRecognitionClass) {
       toast({ title: "Não suportado", description: "Seu navegador não suporta reconhecimento de voz. Use Chrome ou Edge.", variant: "destructive" });
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionClass();
     recognition.lang = "pt-BR";
     recognition.continuous = true;
     recognition.interimResults = true;
