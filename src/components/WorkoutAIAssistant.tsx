@@ -309,18 +309,28 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
         {/* Input */}
         <div className="px-4 py-3 border-t border-border">
           <div className="flex gap-2">
+            <Button
+              size="icon"
+              variant={isListening ? "default" : "outline"}
+              onClick={toggleListening}
+              disabled={isLoading}
+              className={`flex-shrink-0 ${isListening ? "bg-destructive hover:bg-destructive/90 animate-pulse" : ""}`}
+              title={isListening ? "Parar gravação" : "Falar com o assistente"}
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ex: Crie um treino de força para segunda..."
+              placeholder={isListening ? "Ouvindo... fale agora 🎙️" : "Ex: Crie um treino de força para segunda..."}
               className="min-h-[44px] max-h-[120px] resize-none bg-background border-border text-sm"
               rows={1}
               disabled={isLoading}
             />
             <Button
               size="icon"
-              onClick={() => send(input)}
+              onClick={() => { recognitionRef.current?.stop(); setIsListening(false); send(input); }}
               disabled={isLoading || !input.trim()}
               className="flex-shrink-0"
             >
