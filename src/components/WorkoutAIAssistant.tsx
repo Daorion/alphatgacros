@@ -165,7 +165,7 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
   const handleApply = () => {
     if (pendingSuggestion && onApply) {
       onApply(pendingSuggestion);
-      toast({ title: "Treino aplicado!", description: "Os campos do formulário foram preenchidos." });
+      toast({ title: "Treino aplicado!", description: "Treino salvo com sucesso." });
       setPendingSuggestion(null);
     }
   };
