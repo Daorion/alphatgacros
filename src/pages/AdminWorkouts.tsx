@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import WorkoutAIAssistant from "@/components/WorkoutAIAssistant";
+import WorkoutAIAssistant, { WorkoutSuggestion } from "@/components/WorkoutAIAssistant";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Workout {
   id: string;
@@ -61,6 +62,7 @@ const WorkoutSection = ({ icon, label, content }: { icon: string; label: string;
 const AdminWorkouts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
@@ -114,6 +116,41 @@ const AdminWorkouts = () => {
 
   const workoutByDay = new Map<number, Workout>();
   workouts.forEach((w) => workoutByDay.set(w.day_of_week, w));
+
+  const handleAIApply = useCallback(async (suggestion: WorkoutSuggestion) => {
+    if (suggestion.day_of_week === undefined) {
+      toast({ title: "Erro", description: "A IA não especificou o dia da semana.", variant: "destructive" });
+      return;
+    }
+    const existing = workoutByDay.get(suggestion.day_of_week);
+    const payload = {
+      week_start: weekStartStr,
+      day_of_week: suggestion.day_of_week,
+      title: suggestion.title,
+      intensity: suggestion.intensity,
+      tags: suggestion.tags,
+      warmup: suggestion.warmup,
+      activation: suggestion.activation || null,
+      strength: suggestion.strength || null,
+      wod: suggestion.wod,
+      notes: suggestion.notes || null,
+      created_by: user?.id || null,
+    };
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase.from("weekly_workouts").update(payload).eq("id", existing.id));
+    } else {
+      ({ error } = await supabase.from("weekly_workouts").insert(payload));
+    }
+
+    if (error) {
+      toast({ title: "Erro", description: "Não foi possível salvar o treino.", variant: "destructive" });
+    } else {
+      toast({ title: "Treino salvo!", description: `${DAY_NAMES[suggestion.day_of_week]} atualizado.` });
+      fetchWorkouts();
+    }
+  }, [weekStartStr, workouts, user, toast]);
 
   return (
     <div>
@@ -223,6 +260,7 @@ const AdminWorkouts = () => {
         open={aiOpen}
         onOpenChange={setAiOpen}
         weekStart={weekStartStr}
+        onApply={handleAIApply}
       />
     </div>
   );

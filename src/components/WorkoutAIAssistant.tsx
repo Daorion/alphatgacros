@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 type Msg = { role: "user" | "assistant"; content: string };
 
 export interface WorkoutSuggestion {
+  day_of_week?: number;
   title: string;
   intensity: string;
   tags: string[];
@@ -145,8 +146,10 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
       if (isToolCall && toolCallArgs) {
         try {
           const suggestion = JSON.parse(toolCallArgs) as WorkoutSuggestion;
-          setPendingSuggestion(suggestion);
-          upsertAssistant("\n\n✅ **Treino gerado!** Clique em \"Aplicar no Formulário\" para preencher automaticamente.");
+         setPendingSuggestion(suggestion);
+          const DAY_NAMES = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+          const dayLabel = suggestion.day_of_week !== undefined ? ` para **${DAY_NAMES[suggestion.day_of_week]}**` : "";
+          upsertAssistant(`\n\n✅ **Treino gerado${dayLabel}!** Clique em "Aplicar" para salvar.`);
         } catch (e) {
           console.error("Failed to parse tool call:", e);
         }
@@ -162,7 +165,7 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
   const handleApply = () => {
     if (pendingSuggestion && onApply) {
       onApply(pendingSuggestion);
-      toast({ title: "Treino aplicado!", description: "Os campos do formulário foram preenchidos." });
+      toast({ title: "Treino aplicado!", description: "Treino salvo com sucesso." });
       setPendingSuggestion(null);
     }
   };
@@ -247,7 +250,7 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
           <div className="px-4 py-2 border-t border-border">
             <Button onClick={handleApply} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white">
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              Aplicar no Formulário
+              Aplicar Treino
             </Button>
           </div>
         )}
