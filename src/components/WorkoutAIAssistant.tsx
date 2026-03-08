@@ -37,7 +37,7 @@ const WorkoutAIAssistant = ({ open, onOpenChange, weekStart, dayOfWeek, onApply 
   const [isLoading, setIsLoading] = useState(false);
   const [pendingSuggestion, setPendingSuggestion] = useState<WorkoutSuggestion | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
