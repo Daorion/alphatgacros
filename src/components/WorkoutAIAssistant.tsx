@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 type Msg = { role: "user" | "assistant"; content: string };
 
 export interface WorkoutSuggestion {
+  day_of_week?: number;
   title: string;
   intensity: string;
   tags: string[];
