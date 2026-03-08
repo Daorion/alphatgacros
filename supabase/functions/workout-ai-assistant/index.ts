@@ -122,6 +122,7 @@ ${historyContext}`;
           parameters: {
             type: "object",
             properties: {
+              day_of_week: { type: "integer", description: "Dia da semana: 0=Segunda, 1=Terça, 2=Quarta, 3=Quinta, 4=Sexta, 5=Sábado, 6=Domingo. Infira do contexto da conversa." },
               title: { type: "string", description: "Título curto do treino (ex: Força + Engine)" },
               intensity: { type: "string", enum: ["leve", "média", "alta"], description: "Intensidade geral" },
               tags: {
@@ -135,7 +136,7 @@ ${historyContext}`;
               wod: { type: "string", description: "WOD (Workout of the Day)" },
               notes: { type: "string", description: "Observações adicionais" },
             },
-            required: ["title", "intensity", "tags", "warmup", "wod"],
+            required: ["day_of_week", "title", "intensity", "tags", "warmup", "wod"],
             additionalProperties: false,
           },
         },
