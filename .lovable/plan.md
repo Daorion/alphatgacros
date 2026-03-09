@@ -1,39 +1,53 @@
 
 
-## Plano: Seção pública "Treinos da Semana" na landing page
+## Plano: Preparar código para migração a novo projeto com Supabase externo
 
-### Objetivo
-Adicionar uma nova seção na página inicial (visível sem login) que exibe os treinos da semana atual, usando a mesma tabela `weekly_workouts` que já possui RLS permitindo SELECT para usuários autenticados.
+### Contexto
+O código já está bem estruturado e usa variáveis de ambiente (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) para conectar ao backend. As edge functions usam `Deno.env.get("SUPABASE_URL")` etc., que são automaticamente injetados pelo Supabase. Não há URLs ou chaves hardcoded no código.
 
-### Alterações necessárias
+### O que precisa ser feito
 
-**1. RLS — Permitir leitura pública**
-A política atual só permite SELECT para `authenticated`. Precisamos adicionar uma política para `anon` também, já que visitantes não logados precisam ver os treinos.
+**1. Gerar um SQL consolidado de migração**
+Criar um arquivo `supabase/migrations/00000000000000_full_schema.sql` que consolida todas as 5 migrações existentes em uma única, para você rodar no seu Supabase externo. Isso inclui:
+- Enum `app_role`
+- Tabelas: `profiles`, `user_roles`, `murph_registrations`, `audit_logs`, `weekly_workouts`, `bank_accounts`, `financial_categories`, `recurring_transactions`, `financial_transactions`
+- Todas as RLS policies
+- Functions: `has_role`, `handle_new_user`, `update_updated_at_column`
+- Trigger `on_auth_user_created`
+- Storage bucket `receipts`
+- Seed de categorias financeiras
 
-```sql
-CREATE POLICY "Anyone can view workouts"
-  ON public.weekly_workouts FOR SELECT TO anon
-  USING (true);
+**2. Atualizar `supabase/config.toml`**
+Remover o `project_id` do Lovable Cloud para que o arquivo fique genérico e pronto para apontar ao seu projeto.
+
+**3. Criar `.env.example`**
+Criar um arquivo modelo para que no novo projeto você só precise preencher com as credenciais do seu Supabase:
+```
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sua-anon-key
 ```
 
-**2. Novo componente `src/components/WeeklyWorkoutsPublic.tsx`**
-- Busca os treinos da semana atual (calcula `week_start` = segunda-feira da semana corrente)
-- Reutiliza a mesma lógica de `getMonday()` e as constantes `DAY_NAMES`, `TAG_COLORS`, `INTENSITY_COLORS` do `ClientDashboard`
-- Exibe cards dos dias em grid responsivo (1 col mobile, 2 md, 3 lg)
-- Cada card mostra: dia, intensidade, tags, e as seções (warmup, ativação, força, WOD)
-- Destaca o dia atual com borda/glow especial
-- Mostra mensagem "Nenhum treino cadastrado" se vazio
-- Estilo consistente com o restante da landing (dark theme, glass cards)
+**4. Ajustar o `WorkoutAIAssistant.tsx`**
+O componente usa `VITE_SUPABASE_PUBLISHABLE_KEY` como Bearer token para chamar a edge function. Isso precisa ser trocado para usar o token de sessão do usuário (como as outras chamadas fazem), garantindo compatibilidade.
 
-**3. `src/pages/Index.tsx`**
-- Importar e adicionar `<WeeklyWorkoutsPublic />` entre `<Programs />` e `<Gallery />`
+**5. Documentar o processo de setup**
+Adicionar um `SETUP.md` com instruções claras:
+1. Criar projeto no Supabase
+2. Rodar a migração consolidada no SQL Editor
+3. Preencher `.env` com URL e anon key
+4. Configurar secrets nas edge functions (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `LOVABLE_API_KEY`)
+5. Deploy das edge functions
 
-**4. `src/components/Header.tsx`**
-- Adicionar link "Treinos" no nav apontando para `#workouts` (scroll suave)
+### Arquivos que serão criados/alterados
 
-### Detalhes de UX
-- Seção com id `workouts` para navegação por âncora
-- Título: "Treino da Semana" com subtítulo mostrando o período (ex: "03/03 — 09/03")
-- Dia atual destacado visualmente para o visitante saber qual treino é de hoje
-- Seções colapsáveis nos cards para não sobrecarregar visualmente
+| Arquivo | Ação |
+|---|---|
+| `supabase/migrations/00000000000000_full_schema.sql` | Criar (SQL consolidado) |
+| `.env.example` | Criar |
+| `SETUP.md` | Criar |
+| `supabase/config.toml` | Limpar project_id |
+| `src/components/WorkoutAIAssistant.tsx` | Corrigir auth header |
+
+### Nota importante sobre Edge Functions
+As edge functions (`admin-users`, `import-workouts`, `workout-ai-assistant`) já usam `Deno.env.get()` para acessar as variáveis, então funcionarão automaticamente no novo Supabase desde que os secrets estejam configurados. A `workout-ai-assistant` usa `LOVABLE_API_KEY` para o gateway de IA da Lovable — no novo ambiente, você precisará de uma chave de API de IA alternativa (ex: Google Gemini diretamente) ou manter o gateway Lovable se disponível.
 

@@ -1,6 +1,6 @@
 -- =============================================================
 -- Alpha Cross – Full Schema Migration (consolidado)
--- Execute este arquivo no SQL Editor do seu projeto Supabase
+-- Atualizado em 2026-03-09
 -- =============================================================
 
 -- 1. Enum
@@ -131,6 +131,25 @@ CREATE TABLE public.financial_transactions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- ai_conversations
+CREATE TABLE public.ai_conversations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  title text NOT NULL DEFAULT 'Nova conversa',
+  week_start date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ai_messages
+CREATE TABLE public.ai_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id uuid NOT NULL REFERENCES public.ai_conversations(id) ON DELETE CASCADE,
+  role text NOT NULL CHECK (role IN ('user', 'assistant')),
+  content text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- 3. Functions
 
 CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role app_role)
@@ -188,6 +207,10 @@ CREATE TRIGGER update_weekly_workouts_updated_at
   BEFORE UPDATE ON public.weekly_workouts
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE TRIGGER update_ai_conversations_updated_at
+  BEFORE UPDATE ON public.ai_conversations
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 -- 5. Enable RLS on all tables
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -199,6 +222,8 @@ ALTER TABLE public.bank_accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.financial_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.recurring_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.financial_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_messages ENABLE ROW LEVEL SECURITY;
 
 -- 6. RLS Policies
 
@@ -230,6 +255,7 @@ CREATE POLICY "Managers can update all murph registrations" ON public.murph_regi
 
 -- weekly_workouts
 CREATE POLICY "Authenticated users can view workouts" ON public.weekly_workouts FOR SELECT USING (true);
+CREATE POLICY "Anyone can view workouts" ON public.weekly_workouts FOR SELECT TO anon USING (true);
 CREATE POLICY "Admins can do everything on workouts" ON public.weekly_workouts FOR ALL USING (has_role(auth.uid(), 'admin')) WITH CHECK (has_role(auth.uid(), 'admin'));
 
 -- bank_accounts
@@ -243,6 +269,12 @@ CREATE POLICY "Admins can do everything on recurring_transactions" ON public.rec
 
 -- financial_transactions
 CREATE POLICY "Admins can do everything on financial_transactions" ON public.financial_transactions FOR ALL USING (has_role(auth.uid(), 'admin')) WITH CHECK (has_role(auth.uid(), 'admin'));
+
+-- ai_conversations
+CREATE POLICY "Users can manage their own conversations" ON public.ai_conversations FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ai_messages
+CREATE POLICY "Users can manage messages of their conversations" ON public.ai_messages FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.ai_conversations c WHERE c.id = conversation_id AND c.user_id = auth.uid())) WITH CHECK (EXISTS (SELECT 1 FROM public.ai_conversations c WHERE c.id = conversation_id AND c.user_id = auth.uid()));
 
 -- 7. Storage bucket
 INSERT INTO storage.buckets (id, name, public) VALUES ('receipts', 'receipts', false)
